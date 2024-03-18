@@ -9,9 +9,15 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import ca.uqac.fogmap.data.model.LoggedAccountViewModel
+import ca.uqac.fogmap.ui.screens.account.login.LoginScreen
+import ca.uqac.fogmap.ui.screens.account.registration.RegistrationScreen
 
 @Composable
-fun FogmapNavigationGraph(navController : NavHostController) {
+fun FogmapNavigationGraph(
+    navController: NavHostController,
+    loggedAccountViewModel: LoggedAccountViewModel
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -27,11 +33,20 @@ fun FogmapNavigationGraph(navController : NavHostController) {
             }
 
             composable(Routes.LOGIN_SCREEN) {
-                LoginScreen()
+                LoginScreen(
+                    onNavigateToRegistration = { navController.navigate(Routes.REGISTRATION_SCREEN) },
+                    onNavigateToForgotPassword = { /*TODO*/ },
+                    onNavigateToAuthenticatedRoute = { },
+                    loggedAccountViewModel = loggedAccountViewModel,
+                )
+            }
+
+            composable(Routes.REGISTRATION_SCREEN) {
+                RegistrationScreen(
+                    onNavigateBack = { navController.navigate(Routes.LOGIN_SCREEN) },
+                    onNavigateToAuthenticatedRoute = { },
+                )
             }
         }
     }
 }
-
-
-

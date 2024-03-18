@@ -33,13 +33,17 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
+import ca.uqac.fogmap.common.customComposableViews.TitleText
+import ca.uqac.fogmap.data.model.LoggedAccountViewModel
 import ca.uqac.fogmap.ui.screens.FogmapNavigationGraph
 import ca.uqac.fogmap.ui.screens.Routes
 import ca.uqac.fogmap.ui.theme.FogmapTheme
@@ -87,6 +91,11 @@ class MainActivity : ComponentActivity() {
             ),
         )
         val navController = rememberNavController()
+        val loggedAccountViewModel = viewModel { LoggedAccountViewModel() }
+        val loginState by remember {
+            loggedAccountViewModel.loggedState
+        }
+
 
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -103,6 +112,7 @@ class MainActivity : ComponentActivity() {
             ModalNavigationDrawer(
                 drawerContent = {
                     ModalDrawerSheet {
+                        TitleText(text = loginState.username)
                         Spacer(modifier = Modifier.height(16.dp))
                         items.forEachIndexed { index, item ->
                             NavigationDrawerItem(
@@ -164,7 +174,7 @@ class MainActivity : ComponentActivity() {
                             .fillMaxSize()
                             .padding(paddingValue)
                     ) {
-                        FogmapNavigationGraph(navController)
+                        FogmapNavigationGraph(navController, loggedAccountViewModel)
                     }
                 }
             }

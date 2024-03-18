@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import ca.uqac.fogmap.ui.TextComponent
+import ca.uqac.fogmap.common.customComposableViews.TextComponent
 
 @Composable
 fun UserInputScreen(navController: NavHostController) {

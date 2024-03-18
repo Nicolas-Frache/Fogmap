@@ -1,4 +1,4 @@
-package ca.uqac.fogmap.ui
+package ca.uqac.fogmap.common.customComposableViews
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
