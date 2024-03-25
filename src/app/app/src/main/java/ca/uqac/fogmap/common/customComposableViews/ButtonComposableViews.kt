@@ -26,7 +26,8 @@ fun NormalButton(
     Button(
         modifier = modifier
             .height(AppTheme.dimens.normalButtonHeight)
-            .requiredWidth(AppTheme.dimens.minButtonWidth),
+            //.requiredWidth(AppTheme.dimens.minButtonWidth)
+        ,
         onClick = onClick
     ) {
         Text(text = text, style = MaterialTheme.typography.titleMedium)
