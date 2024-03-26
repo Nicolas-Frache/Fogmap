@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "235159561550",
+    "project_id": "fogmap-417423",
+    "storage_bucket": "fogmap-417423.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:235159561550:android:7cda959db4d07301c32a1f",
+        "android_client_info": {
+          "package_name": "ca.uqac.fogmap"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "235159561550-no10pkg5sueimsfl0c5ts8c92mna907q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ca.uqac.fogmap",
+            "certificate_hash": "b998673bc6f6574b3fc706cc470920def15b0c5f"
+          }
+        },
+        {
+          "client_id": "235159561550-kgoh178fhom8glftcb6j7r4i639lppek.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHm08Ersi39wRiwtBcDwdixRHigP40s0I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "235159561550-kgoh178fhom8glftcb6j7r4i639lppek.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -41,4 +41,5 @@
 
     <!--Dashboard-->
     <string name="dashboard_title_welcome_user">Welcome User</string>
+    <string name="default_web_client_id">Remplacé par la valeur de google-services.json durant build</string>
 </resources>
