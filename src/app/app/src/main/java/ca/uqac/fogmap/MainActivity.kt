@@ -31,8 +31,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -42,11 +44,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
-import ca.uqac.fogmap.common.customComposableViews.TitleText
+import ca.uqac.fogmap.common.customComposableViews.MediumTitleText
 import ca.uqac.fogmap.data.model.LoggedAccountViewModel
 import ca.uqac.fogmap.ui.screens.FogmapNavigationGraph
 import ca.uqac.fogmap.ui.screens.Routes
 import ca.uqac.fogmap.ui.theme.FogmapTheme
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -66,6 +70,7 @@ class MainActivity : ComponentActivity() {
         val badgeCount: Int? = null,
         val route: String,
     )
+
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
@@ -92,10 +97,20 @@ class MainActivity : ComponentActivity() {
         )
         val navController = rememberNavController()
         val loggedAccountViewModel = viewModel { LoggedAccountViewModel() }
-        val loginState by remember {
-            loggedAccountViewModel.loggedState
-        }
+        val loginState by remember { loggedAccountViewModel.loggedState }
 
+        // Observer pour les changements de l'utilisateur FirebaseAuth
+        var user by remember { mutableStateOf<FirebaseUser?>(FirebaseAuth.getInstance().currentUser) }
+        DisposableEffect(Unit) {
+            val auth = FirebaseAuth.getInstance()
+            val listener = FirebaseAuth.AuthStateListener { firebaseAuth ->
+                user = firebaseAuth.currentUser
+            }
+            auth.addAuthStateListener(listener)
+            onDispose {
+                auth.removeAuthStateListener(listener)
+            }
+        }
 
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -103,17 +118,28 @@ class MainActivity : ComponentActivity() {
         ) {
             val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
             val scope = rememberCoroutineScope()
-            var selectedItemIndex by rememberSaveable {
-                mutableIntStateOf(0)
-            }
+            var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
 
             // Template de navigationDrawer :
             // https://www.youtube.com/watch?v=aYSarwALlpI
             ModalNavigationDrawer(
                 drawerContent = {
                     ModalDrawerSheet {
-                        TitleText(text = loginState.username)
-                        Spacer(modifier = Modifier.height(16.dp))
+                        if (user?.displayName == null) {
+                            MediumTitleText(
+                                text = "Non connecté",
+                                modifier = Modifier.padding(10.dp)
+                            )
+                        } else {
+                            MediumTitleText(
+                                text = "Bienvenue : ${user?.displayName}",
+                                modifier = Modifier.padding(10.dp)
+                            )
+                        }
+                        Spacer(
+                            modifier = Modifier.height(16.dp),
+                        )
+
                         items.forEachIndexed { index, item ->
                             NavigationDrawerItem(
                                 label = {
