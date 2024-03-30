@@ -1,8 +1,8 @@
 <resources>
-    <string name="app_name">Fogmap</string>
-    <string name="jetpack_compose">Jetpack Compose</string>
+    <string name="app_name" translatable="false">Fogmap</string>
+    <string name="jetpack_compose" translatable="false">Jetpack Compose</string>
 
-    <string name="empty_string" />
+    <string name="empty_string" translatable="false" />
 
     <string name="navigate_back">Navigate to the previous screen</string>
 

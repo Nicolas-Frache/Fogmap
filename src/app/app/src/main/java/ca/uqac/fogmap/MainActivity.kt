@@ -1,5 +1,7 @@
 package ca.uqac.fogmap
 
+import android.content.ComponentName
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,10 +13,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -54,14 +58,22 @@ import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+    public var PACKAGE_NAME: String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        PACKAGE_NAME = applicationContext.packageName;
         setContent {
             FogmapTheme {
                 FogmapApp()
             }
         }
     }
+
+    private fun Intent.withComponent(packageName: String, exampleName: String): Intent {
+        component = ComponentName(packageName, exampleName)
+        return this
+    }
+
 
     data class NavigationItem(
         val title: String,
@@ -83,6 +95,12 @@ class MainActivity : ComponentActivity() {
                 route = Routes.WELCOME_SCREEN,
             ),
             NavigationItem(
+                title = "Carte",
+                selectedIcon = Icons.Filled.Map,
+                unselectedIcon = Icons.Outlined.Map,
+                route = Routes.MAP_SCREEN,
+            ),
+            NavigationItem(
                 title = "Mon Compte",
                 selectedIcon = Icons.Filled.AccountCircle,
                 unselectedIcon = Icons.Outlined.AccountCircle,
@@ -97,7 +115,6 @@ class MainActivity : ComponentActivity() {
         )
         val navController = rememberNavController()
         val loggedAccountViewModel = viewModel { LoggedAccountViewModel() }
-        val loginState by remember { loggedAccountViewModel.loggedState }
 
         // Observer pour les changements de l'utilisateur FirebaseAuth
         var user by remember { mutableStateOf<FirebaseUser?>(FirebaseAuth.getInstance().currentUser) }
@@ -123,6 +140,7 @@ class MainActivity : ComponentActivity() {
             // Template de navigationDrawer :
             // https://www.youtube.com/watch?v=aYSarwALlpI
             ModalNavigationDrawer(
+                gesturesEnabled = false,
                 drawerContent = {
                     ModalDrawerSheet {
                         if (user?.displayName == null) {

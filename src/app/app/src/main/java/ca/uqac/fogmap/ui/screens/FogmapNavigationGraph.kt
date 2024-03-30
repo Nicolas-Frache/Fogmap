@@ -12,6 +12,7 @@ import androidx.navigation.compose.composable
 import ca.uqac.fogmap.data.model.LoggedAccountViewModel
 import ca.uqac.fogmap.ui.screens.account.login.LoginScreen
 import ca.uqac.fogmap.ui.screens.account.registration.RegistrationScreen
+import ca.uqac.fogmap.ui.screens.map.MapScreen_EntryPoint
 
 @Composable
 fun FogmapNavigationGraph(
@@ -26,6 +27,10 @@ fun FogmapNavigationGraph(
         NavHost(navController = navController, startDestination = Routes.WELCOME_SCREEN) {
             composable(Routes.USER_INPUT_SCREEN) {
                 UserInputScreen(navController)
+            }
+
+            composable(Routes.MAP_SCREEN) {
+                MapScreen_EntryPoint()
             }
 
             composable(Routes.WELCOME_SCREEN) {

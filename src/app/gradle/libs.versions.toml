@@ -1,5 +1,8 @@
 [versions]
+accompanistPermissions = "0.34.0"
 agp = "8.3.1"
+android = "11.2.2"
+appcompat = "1.6.1"
 coilCompose = "2.6.0"
 firebaseAuth = "22.3.1"
 firebaseBom = "32.8.0"
@@ -12,12 +15,16 @@ kotlinxCoroutinesPlayServices = "1.7.3"
 lifecycleRuntimeKtx = "2.7.0"
 activityCompose = "1.8.2"
 composeBom = "2024.02.02"
+mapsCompose = "11.2.2"
 materialIconsExtended = "1.6.3"
 navigationCompose = "2.7.7"
 onetapcompose = "1.0.12"
 playServicesAuth = "21.0.0"
 
 [libraries]
+accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
+mapbox = { module = "com.mapbox.maps:android", version.ref = "android" }
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
@@ -39,6 +46,7 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlinxCoroutinesPlayServices" }
+mapbox-compose = { module = "com.mapbox.extension:maps-compose", version.ref = "mapsCompose" }
 onetapcompose = { module = "com.github.stevdza-san:OneTapCompose", version.ref = "onetapcompose" }
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 

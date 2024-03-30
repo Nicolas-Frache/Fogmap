@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,11 +28,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import ca.uqac.fogmap.R
 import ca.uqac.fogmap.common.customComposableViews.AlertDialogError
 import ca.uqac.fogmap.common.customComposableViews.NormalButton
-import ca.uqac.fogmap.common.customComposableViews.TextComponent
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
@@ -82,7 +80,7 @@ fun WelcomeScreen() {
         modifier = Modifier.fillMaxSize()
     ) {
 
-        TextComponent(textValue = "Bienvenue sur Fogmap !", textSize = 20.sp)
+        Text(text = "Bienvenue sur Fogmap !", style = typography.bodyLarge)
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
@@ -124,6 +122,7 @@ fun tryFirebaseLog(
         .build()
 
     val googleSignInClient = GoogleSignIn.getClient(context, gso)
+    googleSignInClient.signOut()
     launcher.launch(googleSignInClient.signInIntent)
 }
 

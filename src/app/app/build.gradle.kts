@@ -85,6 +85,13 @@ dependencies {
     implementation(libs.play.services.auth)
     implementation(libs.kotlinx.coroutines.play.services)
 
+    // Mapbox
+    implementation(libs.mapbox)
+    implementation(libs.mapbox.compose)
+
+    // Google permission helper
+    implementation(libs.accompanist.permissions)
+    implementation(libs.androidx.appcompat)
 
 
 }
