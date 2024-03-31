@@ -88,6 +88,7 @@ dependencies {
     // Mapbox
     implementation(libs.mapbox)
     implementation(libs.mapbox.compose)
+    implementation(libs.mapbox.sdk.turf)
 
     // Google permission helper
     implementation(libs.accompanist.permissions)

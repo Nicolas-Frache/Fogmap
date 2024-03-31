@@ -20,15 +20,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import ca.uqac.fogmap.R
 import ca.uqac.fogmap.utils.RequestLocationPermission
 import kotlinx.coroutines.launch
 
-/**
- * Example to showcase usage of Location Component.
- */
 @Composable
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-fun MapPermissionScreen(mapScreenContent :  @Composable () -> Unit) {
+fun MapPermissionScreen(mapScreenContent: @Composable () -> Unit) {
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -80,7 +78,7 @@ fun MapPermissionScreen(mapScreenContent :  @Composable () -> Unit) {
                             context.startActivity(
                                 Intent(
                                     android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                                    Uri.fromParts("package", "MainActivity", null)
+                                    Uri.fromParts("package", R.string.package_name.toString(), null)
                                 )
                             )
                         }

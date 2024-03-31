@@ -3,6 +3,7 @@ package ca.uqac.fogmap
 import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
@@ -67,6 +68,7 @@ class MainActivity : ComponentActivity() {
                 FogmapApp()
             }
         }
+        Log.d("FOGMAP", applicationContext.packageName)
     }
 
     private fun Intent.withComponent(packageName: String, exampleName: String): Intent {
@@ -115,6 +117,7 @@ class MainActivity : ComponentActivity() {
         )
         val navController = rememberNavController()
         val loggedAccountViewModel = viewModel { LoggedAccountViewModel() }
+
 
         // Observer pour les changements de l'utilisateur FirebaseAuth
         var user by remember { mutableStateOf<FirebaseUser?>(FirebaseAuth.getInstance().currentUser) }
