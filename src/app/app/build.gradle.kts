@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     id("com.google.gms.google-services")
+    id("com.google.devtools.ksp") version "1.8.21-1.0.11"
 }
 
 android {
@@ -98,4 +99,8 @@ dependencies {
     // Outils pour les calculs géométriques sur la map
     implementation(libs.arcgis.android)
 
+    //Room
+    //implementation(libs.androidx.room.runtime)
+    //ksp(libs.androidx.room.compiler)
+    //implementation(libs.androidx.room.ktx)
 }

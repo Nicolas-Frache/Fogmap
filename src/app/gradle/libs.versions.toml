@@ -22,9 +22,14 @@ materialIconsExtended = "1.6.3"
 navigationCompose = "2.7.7"
 onetapcompose = "1.0.12"
 playServicesAuth = "21.0.0"
+roomCompiler = "2.6.1"
+roomRuntime = "2.6.1"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomCompiler" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 arcgis-android = { module = "com.esri.arcgisruntime:arcgis-android", version.ref = "arcgisAndroid" }
 mapbox = { module = "com.mapbox.maps:android", version.ref = "mapboxAndroid" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
