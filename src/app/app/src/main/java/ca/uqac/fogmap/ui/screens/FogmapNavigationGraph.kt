@@ -1,5 +1,6 @@
 package ca.uqac.fogmap.ui.screens
 
+import TitledBubbleListPage
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -7,8 +8,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import ca.uqac.fogmap.data.model.LoggedAccountViewModel
 import ca.uqac.fogmap.ui.screens.account.login.LoginScreen
 import ca.uqac.fogmap.ui.screens.account.registration.RegistrationScreen
@@ -35,6 +38,21 @@ fun FogmapNavigationGraph(
 
             composable(Routes.WELCOME_SCREEN) {
                 WelcomeScreen()
+            }
+
+            composable(Routes.VISITED_LOCATION_SCREEN) {
+                TitledBubbleListPage(
+                    items = listOf("Parlement de Bretagne", "Mairie de Rennes"), navController)
+            }
+
+            composable(
+                route = "${Routes.LOCATION_INFORMATION}/{name}",
+                arguments = listOf(navArgument("name") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val name = backStackEntry.arguments?.getString("name") ?: "John Doe"
+                LocationInformation(
+                    name = name,
+                )
             }
 
             composable(Routes.LOGIN_SCREEN) {

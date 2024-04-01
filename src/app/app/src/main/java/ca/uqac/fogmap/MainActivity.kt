@@ -13,11 +13,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material.icons.outlined.Settings
@@ -107,6 +109,12 @@ class MainActivity : ComponentActivity() {
                 selectedIcon = Icons.Filled.AccountCircle,
                 unselectedIcon = Icons.Outlined.AccountCircle,
                 route = Routes.LOGIN_SCREEN,
+            ),
+            NavigationItem(
+                title = "Lieux visités",
+                selectedIcon = Icons.Filled.Checklist,
+                unselectedIcon = Icons.Outlined.Checklist,
+                route = Routes.VISITED_LOCATION_SCREEN,
             ),
             NavigationItem(
                 title = "Settings",
