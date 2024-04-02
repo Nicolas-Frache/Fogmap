@@ -13,12 +13,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Map
@@ -115,6 +117,12 @@ class MainActivity : ComponentActivity() {
                 selectedIcon = Icons.Filled.Checklist,
                 unselectedIcon = Icons.Outlined.Checklist,
                 route = Routes.VISITED_LOCATION_SCREEN,
+            ),
+            NavigationItem(
+                title = "Ajouter un lieu",
+                selectedIcon = Icons.Filled.Add,
+                unselectedIcon = Icons.Outlined.Add,
+                route = Routes.ADD_LOCATION,
             ),
             NavigationItem(
                 title = "Settings",

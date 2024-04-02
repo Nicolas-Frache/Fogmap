@@ -14,10 +14,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import ca.uqac.fogmap.locations.MapLocations
 import ca.uqac.fogmap.ui.screens.Routes
 
 @Composable
-fun TitledBubbleListPage(items: List<String>, navController: NavController) {
+fun TitledBubbleListPage(navController: NavController) {
+    val items = MapLocations.map.keys.toList()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -46,7 +48,7 @@ fun TitledBubbleListPage(items: List<String>, navController: NavController) {
                 ) {
                     Text(
                         text = item,
-                        modifier = Modifier.padding(8.dp),
+                        modifier = Modifier.padding(8.dp).padding(start = 16.dp),
                         color = Color.Black
                     )
                 }

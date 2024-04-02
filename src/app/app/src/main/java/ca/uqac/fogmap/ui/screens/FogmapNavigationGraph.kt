@@ -41,8 +41,11 @@ fun FogmapNavigationGraph(
             }
 
             composable(Routes.VISITED_LOCATION_SCREEN) {
-                TitledBubbleListPage(
-                    items = listOf("Parlement de Bretagne", "Mairie de Rennes"), navController)
+                TitledBubbleListPage(navController)
+            }
+
+            composable(Routes.ADD_LOCATION) {
+                AddLocation(navController)
             }
 
             composable(
