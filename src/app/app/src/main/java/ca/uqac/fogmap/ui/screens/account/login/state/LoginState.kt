@@ -1,6 +1,7 @@
 package ca.uqac.fogmap.ui.screens.account.login.state
 
 import ca.uqac.fogmap.common.state.ErrorState
+import com.google.firebase.auth.FirebaseUser
 
 /**
  * Login State holding ui input values
@@ -9,7 +10,8 @@ data class LoginState(
     val emailOrMobile: String = "",
     val password: String = "",
     val errorState: LoginErrorState = LoginErrorState(),
-    val isLoginSuccessful: Boolean = false
+    val isLoginSuccessful: Boolean = false,
+    val user: FirebaseUser? = null
 )
 
 /**
