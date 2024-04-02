@@ -2,7 +2,6 @@ package ca.uqac.fogmap.data
 
 import android.content.Context
 import android.util.Log
-import ca.uqac.fogmap.R
 import ca.uqac.fogmap.ui.screens.map.argGiPolygonToMapBox
 import ca.uqac.fogmap.ui.screens.map.geoJsonTripToPolyline
 import com.esri.arcgisruntime.geometry.GeometryEngine
@@ -24,21 +23,26 @@ var WholeWorld = Polygon(PointCollection(SpatialReferences.getWgs84()).apply {
 var AllTripLines: ArrayList<Polyline> = ArrayList()
 
 class FogLayerDataProvider  {
+    private constructor(context: Context){
+        initTracksData(context)
+    }
+
     companion object {
         @Volatile
         private var instance: FogLayerDataProvider? = null // Volatile modifier is necessary
 
-        fun getInstance() =
+        fun getInstance(context: Context) =
             instance ?: synchronized(this) { // synchronized to avoid concurrency problem
-                instance ?: FogLayerDataProvider().also { instance = it }
+                instance ?: FogLayerDataProvider(context).also { instance = it }
             }
     }
 
-    fun initWithMockData(context: Context) {
-        AllTripLines.apply {
-            add(geoJsonTripToPolyline(context, R.raw.sample_track_1))
-            add(geoJsonTripToPolyline(context, R.raw.sample_track_2))
-            add(geoJsonTripToPolyline(context, R.raw.sample_track_3))
+    private fun initTracksData(context: Context) {
+        val files: Array<String> = context.fileList()
+        for(file in files){
+            if(file.contains(".geojson")){
+                AllTripLines.add(geoJsonTripToPolyline(context, file))
+            }
         }
     }
 

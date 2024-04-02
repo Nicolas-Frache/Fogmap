@@ -65,11 +65,10 @@ private fun MapScreen_Map() {
     val drawable = ContextCompat.getDrawable(context, ca.uqac.fogmap.R.drawable.fog_bg5)
     val fog_pattern = (drawable as BitmapDrawable).bitmap
 
-    FogLayerDataProvider.getInstance().initWithMockData(context)
-    val newPolygon = FogLayerDataProvider.getInstance().getFogPolygon()
+    val newPolygon = FogLayerDataProvider.getInstance(context).getFogPolygon()
 
     var lines = ArrayList<Feature>().apply {
-        FogLayerDataProvider.getInstance().getAllTripLines().forEach { line ->
+        FogLayerDataProvider.getInstance(context).getAllTripLines().forEach { line ->
             add(Feature.fromGeometry(line))
         }
     }

@@ -1,5 +1,8 @@
 package ca.uqac.fogmap
 
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -59,6 +62,8 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        initMockData()
+        PACKAGE_NAME = applicationContext.packageName;
         setContent {
             FogmapTheme {
                 FogmapApp()
@@ -66,7 +71,7 @@ class MainActivity : ComponentActivity() {
         }
         val currentUser = Firebase.auth.currentUser
         Log.d("MainActivity", "Current user: $currentUser")
-
+        
         addUserToFirestore(currentUser) { success, exception ->
             if (success) {
                 Log.d("MainActivity", "User added to Firestore successfully")
@@ -74,6 +79,32 @@ class MainActivity : ComponentActivity() {
                 Log.e("MainActivity", "Error adding user to Firestore", exception)
             }
         }
+        }
+    }
+
+    fun initMockData() {
+        val files: Array<String> = applicationContext.fileList()
+        Log.d("FOGMAP", "${files.size} files in local storage")
+        if (files.size < 3) {
+            copyFileToLocalStorage(R.raw.sample_track_1, "sample_track_1.geojson")
+            copyFileToLocalStorage(R.raw.sample_track_2, "sample_track_2.geojson")
+            copyFileToLocalStorage(R.raw.sample_track_3, "sample_track_3.geojson")
+            Log.d("FOGMAP", "Mock data copied to local storage")
+        }
+    }
+
+    fun copyFileToLocalStorage(ressourceId: Int, filename: String) {
+        val fileContents =
+            applicationContext.resources.openRawResource(ressourceId).bufferedReader()
+                .use { it.readText() }
+        applicationContext.openFileOutput(filename, Context.MODE_PRIVATE).use {
+            it.write(fileContents.toByteArray())
+        }
+    }
+
+    private fun Intent.withComponent(packageName: String, exampleName: String): Intent {
+        component = ComponentName(packageName, exampleName)
+        return this
     }
 
     data class NavigationItem(

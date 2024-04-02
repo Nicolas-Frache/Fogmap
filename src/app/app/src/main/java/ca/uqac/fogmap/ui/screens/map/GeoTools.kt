@@ -41,8 +41,8 @@ fun argGiPolygonToMapBox(arcPolygon: Geometry): Polygon {
     return Polygon.fromOuterInner(newOuter, inners)
 }
 
-fun geoJsonTripToPolyline(context: Context, ressource: Int): Polyline {
-    val text = context.resources.openRawResource(ressource)
+fun geoJsonTripToPolyline(context: Context, filename: String): Polyline {
+    val text = context.openFileInput(filename)
         .bufferedReader().use { it.readText() }
 
     val points = FeatureCollection.fromJson(text).features()!!.map { it.geometry() as Point }
