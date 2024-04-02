@@ -58,9 +58,13 @@ import ca.uqac.fogmap.common.customComposableViews.MediumTitleText
 import ca.uqac.fogmap.data.model.LoggedAccountViewModel
 import ca.uqac.fogmap.ui.screens.FogmapNavigationGraph
 import ca.uqac.fogmap.ui.screens.Routes
+import ca.uqac.fogmap.ui.screens.rememberFirebaseAuthLauncher
 import ca.uqac.fogmap.ui.theme.FogmapTheme
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -75,6 +79,17 @@ class MainActivity : ComponentActivity() {
             }
         }
         Log.d("FOGMAP", applicationContext.packageName)
+
+        val currentUser = Firebase.auth.currentUser
+        Log.d("MainActivity", "Current user: $currentUser")
+
+        addUserToFirestore(currentUser) { success, exception ->
+            if (success) {
+                Log.d("MainActivity", "User added to Firestore successfully")
+            } else {
+                Log.e("MainActivity", "Error adding user to Firestore", exception)
+            }
+        }
     }
 
 
@@ -115,6 +130,7 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun FogmapApp() {
+        var user by remember { mutableStateOf(Firebase.auth.currentUser) }
         val items = listOf(
             NavigationItem(
                 title = "Accueil",
@@ -156,6 +172,16 @@ class MainActivity : ComponentActivity() {
         val navController = rememberNavController()
         val loggedAccountViewModel = viewModel { LoggedAccountViewModel() }
 
+        val launcher = rememberFirebaseAuthLauncher(
+            onAuthComplete = { result ->
+                loggedAccountViewModel.currentUser = result.user
+                user = result.user
+            },
+            onAuthError = {
+                Log.d("FOGMAP", it.toString())
+                user = null
+            }
+        )
 
         // Observer pour les changements de l'utilisateur FirebaseAuth
         var user by remember { mutableStateOf<FirebaseUser?>(FirebaseAuth.getInstance().currentUser) }
@@ -266,4 +292,32 @@ class MainActivity : ComponentActivity() {
         }
     }
     // https://youtu.be/dEEyZkZekvI?si=HkFDP_s9SgX-GD84&t=1976
+}
+
+fun addUserToFirestore(user: FirebaseUser?, onComplete: (Boolean, Exception?) -> Unit) {
+    if (user == null) {
+        onComplete(false, IllegalArgumentException("User is null"))
+        return
+    }
+
+    val db = FirebaseFirestore.getInstance()
+    val userCollection = db.collection("users")
+
+    // Créer un objet avec les informations de l'utilisateur
+    val userData = hashMapOf(
+        "uid" to user.uid,
+        "displayName" to user.displayName,
+        "email" to user.email
+        // Ajoutez d'autres champs si nécessaire
+    )
+
+    // Ajouter l'utilisateur à la collection "users" avec l'UID comme ID du document
+    userCollection.document(user.uid)
+        .set(userData)
+        .addOnSuccessListener {
+            onComplete(true, null)
+        }
+        .addOnFailureListener { e ->
+            onComplete(false, e)
+        }
 }
