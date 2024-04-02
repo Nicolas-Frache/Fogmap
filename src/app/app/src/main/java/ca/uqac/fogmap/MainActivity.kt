@@ -1,8 +1,6 @@
 package ca.uqac.fogmap
 
 import android.content.ComponentName
-import android.content.Intent
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -78,11 +76,7 @@ class MainActivity : ComponentActivity() {
         }
         Log.d("FOGMAP", applicationContext.packageName)
     }
-    
-    private fun Intent.withComponent(packageName: String, exampleName: String): Intent {
-        component = ComponentName(packageName, exampleName)
-        return this
-    }
+
 
     fun initMockData() {
         val files: Array<String> = applicationContext.fileList()

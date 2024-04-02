@@ -29,14 +29,20 @@ import com.mapbox.maps.extension.compose.style.MapboxStandardStyle
 import com.mapbox.maps.extension.compose.style.layers.generated.FillLayer
 import com.mapbox.maps.extension.compose.style.layers.generated.FillOpacity
 import com.mapbox.maps.extension.compose.style.layers.generated.FillPattern
+import com.mapbox.maps.extension.compose.style.layers.generated.LineColor
 import com.mapbox.maps.extension.compose.style.layers.generated.LineLayer
+import com.mapbox.maps.extension.compose.style.layers.generated.LineWidth
 import com.mapbox.maps.extension.compose.style.sources.generated.GeoJSONData
 import com.mapbox.maps.extension.compose.style.sources.generated.GeoJsonSource
+import com.mapbox.maps.extension.style.expressions.dsl.generated.get
+import com.mapbox.maps.extension.style.expressions.dsl.generated.literal
+import com.mapbox.maps.extension.style.expressions.generated.Expression.Companion.rgba
 import com.mapbox.maps.extension.style.style
 import com.mapbox.maps.plugin.PuckBearing
 import com.mapbox.maps.plugin.locationcomponent.createDefault2DPuck
 import com.mapbox.maps.plugin.viewport.ViewportStatus
 import com.mapbox.maps.toMapboxImage
+import kotlin.random.Random
 
 
 @Composable
@@ -48,7 +54,7 @@ fun MapScreen_EntryPoint() {
 
 
 @OptIn(MapboxExperimental::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "IncorrectNumberOfArgumentsInExpression")
 @Composable
 private fun MapScreen_Map() {
     val context = LocalContext.current
@@ -69,7 +75,11 @@ private fun MapScreen_Map() {
 
     var lines = ArrayList<Feature>().apply {
         FogLayerDataProvider.getInstance(context).getAllTripLines().forEach { line ->
-            add(Feature.fromGeometry(line))
+            add(Feature.fromGeometry(line).apply {
+                addNumberProperty("color_r", Random.nextInt(0, 255))
+                addNumberProperty("color_g", Random.nextInt(0, 255))
+                addNumberProperty("color_b", Random.nextInt(0, 255))
+            })
         }
     }
 
@@ -110,7 +120,19 @@ private fun MapScreen_Map() {
                             data = GeoJSONData(newPolygon),
                         )
 
-                        LineLayer(layerId = "line_layer", sourceId = "line_source")
+                        LineLayer(
+                            layerId = "line_layer",
+                            sourceId = "line_source",
+                            lineColor = LineColor(
+                                rgba(
+                                    get("color_r"),
+                                    get("color_g"),
+                                    get("color_b"),
+                                    literal(1.0)
+                                )
+                            ),
+                            lineWidth = LineWidth(3.0)
+                        )
                         GeoJsonSource(
                             sourceId = "line_source",
                             data = GeoJSONData(lines),
