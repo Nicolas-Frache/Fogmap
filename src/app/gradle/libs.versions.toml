@@ -24,6 +24,7 @@ onetapcompose = "1.0.12"
 playServicesAuth = "21.0.0"
 roomCompiler = "2.6.1"
 roomRuntime = "2.6.1"
+firebaseFirestoreKtx = "24.11.0"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
@@ -58,6 +59,7 @@ mapbox-compose = { module = "com.mapbox.extension:maps-compose", version.ref = "
 mapbox-sdk-turf = { module = "com.mapbox.mapboxsdk:mapbox-sdk-turf", version.ref = "mapboxSdkTurf" }
 onetapcompose = { module = "com.github.stevdza-san:OneTapCompose", version.ref = "onetapcompose" }
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
+firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

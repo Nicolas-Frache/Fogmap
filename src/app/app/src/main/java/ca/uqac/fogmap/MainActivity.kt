@@ -174,7 +174,8 @@ class MainActivity : ComponentActivity() {
 
         val launcher = rememberFirebaseAuthLauncher(
             onAuthComplete = { result ->
-                loggedAccountViewModel.currentUser = result.user
+                //loggedAccountViewModel.currentUser = result.user
+                loggedAccountViewModel.user = result.user
                 user = result.user
             },
             onAuthError = {
@@ -184,7 +185,7 @@ class MainActivity : ComponentActivity() {
         )
 
         // Observer pour les changements de l'utilisateur FirebaseAuth
-        var user by remember { mutableStateOf<FirebaseUser?>(FirebaseAuth.getInstance().currentUser) }
+        //var user by remember { mutableStateOf<FirebaseUser?>(FirebaseAuth.getInstance().currentUser) }
         DisposableEffect(Unit) {
             val auth = FirebaseAuth.getInstance()
             val listener = FirebaseAuth.AuthStateListener { firebaseAuth ->
