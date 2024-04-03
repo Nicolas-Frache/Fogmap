@@ -11,4 +11,5 @@ object Routes {
     const val LOCATION_INFORMATION = "LOCATION_INFORMATION"
     const val ADD_LOCATION = "ADD_LOCATION"
     const val MY_ACCOUNT = "MY_ACCOUNT"
+    const val QUESTION = "QUESTION"
 }

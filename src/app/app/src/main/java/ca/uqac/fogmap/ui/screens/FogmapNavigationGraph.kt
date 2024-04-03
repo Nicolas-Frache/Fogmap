@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -16,6 +17,9 @@ import ca.uqac.fogmap.data.model.LoggedAccountViewModel
 import ca.uqac.fogmap.ui.screens.account.login.LoginScreen
 import ca.uqac.fogmap.ui.screens.account.registration.RegistrationScreen
 import ca.uqac.fogmap.ui.screens.map.MapScreen_EntryPoint
+import ca.uqac.fogmap.ui.screens.questions.AnswerPage
+import ca.uqac.fogmap.ui.screens.questions.QuestionListPage
+import ca.uqac.fogmap.ui.screens.questions.QuestionPage
 
 @Composable
 fun FogmapNavigationGraph(
@@ -72,6 +76,31 @@ fun FogmapNavigationGraph(
                     onNavigateBack = { navController.navigate(Routes.LOGIN_SCREEN) },
                     onNavigateToAuthenticatedRoute = { },
                 )
+            }
+
+            composable(
+                route = Routes.QUESTION
+            ) {
+                QuestionListPage(navController = navController)
+            }
+
+            composable(
+                route = "${Routes.QUESTION}/{index}",
+                arguments = listOf(navArgument("index") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val index = remember {backStackEntry.arguments?.getInt("index") ?: 0}
+                QuestionPage(navController, index)
+            }
+
+            composable(
+                route = "${Routes.QUESTION}/{index}/{option}",
+                arguments = listOf(
+                    navArgument("index") { type = NavType.IntType },
+                    navArgument("option") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val index = remember {backStackEntry.arguments?.getInt("index") ?: 0}
+                val option = remember {backStackEntry.arguments?.getInt("option") ?: 0}
+                AnswerPage(navController, index, option)
             }
         }
     }
