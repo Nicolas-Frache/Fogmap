@@ -151,7 +151,7 @@ class MainActivity : ComponentActivity() {
                 title = "Mon Compte",
                 selectedIcon = Icons.Filled.AccountCircle,
                 unselectedIcon = Icons.Outlined.AccountCircle,
-                route = Routes.LOGIN_SCREEN,
+                route = Routes.MY_ACCOUNT,
             ),
             NavigationItem(
                 title = "Lieux visités",

@@ -36,6 +36,10 @@ fun FogmapNavigationGraph(
                 UserInputScreen(navController)
             }
 
+            composable(Routes.MY_ACCOUNT) {
+                MyAccountScreen(loggedAccountViewModel)
+            }
+
             composable(Routes.MAP_SCREEN) {
                 MapScreen_EntryPoint()
             }
