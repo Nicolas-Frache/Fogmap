@@ -2,6 +2,7 @@ package ca.uqac.fogmap.ui.screens.map
 
 import android.annotation.SuppressLint
 import android.graphics.drawable.BitmapDrawable
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.FabPosition
@@ -11,16 +12,29 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.core.content.ContextCompat
 import ca.uqac.fogmap.data.FogLayerDataProvider
+import com.mapbox.common.location.AccuracyLevel
+import com.mapbox.common.location.DeviceLocationProvider
+import com.mapbox.common.location.IntervalSettings
+import com.mapbox.common.location.Location
+import com.mapbox.common.location.LocationObserver
+import com.mapbox.common.location.LocationProviderRequest
+import com.mapbox.common.location.LocationService
+import com.mapbox.common.location.LocationServiceFactory
 import com.mapbox.geojson.Feature
+import com.mapbox.geojson.Geometry
 import com.mapbox.geojson.Point.fromLngLat
 import com.mapbox.maps.ImageStretches
 import com.mapbox.maps.MapboxExperimental
+import com.mapbox.maps.Style
 import com.mapbox.maps.extension.compose.DefaultSettingsProvider
 import com.mapbox.maps.extension.compose.MapEffect
 import com.mapbox.maps.extension.compose.MapboxMap
@@ -52,6 +66,44 @@ fun MapScreen_EntryPoint() {
     }
 }
 
+fun initLocation(fogPolygon: Geometry, onFogUpdate: () -> Unit) {
+    val locationService: LocationService = LocationServiceFactory.getOrCreate()
+    var locationProvider: DeviceLocationProvider? = null
+
+    val request = LocationProviderRequest.Builder()
+        .interval(
+            IntervalSettings.Builder()
+                .interval(5000L).minimumInterval(5000L).maximumInterval(5000L)
+                .build()
+        )
+        .displacement(10F)
+        .accuracy(AccuracyLevel.HIGHEST)
+        .build();
+
+    val result = locationService.getDeviceLocationProvider(request)
+    if (result.isValue) {
+        locationProvider = result.value!!
+    } else {
+        Log.e("FOGMAP", "Failed to get device location provider")
+    }
+
+
+    val locationObserver = object : LocationObserver {
+        override fun onLocationUpdateReceived(locations: MutableList<Location>) {
+            updateLocation(locations[0], onFogUpdate)
+        }
+    }
+    locationProvider?.addLocationObserver(locationObserver)
+}
+
+fun updateLocation(location: Location, onFogUpdate: () -> Unit) {
+    Log.d("FOGMAP", "Location update received: $location")
+    FogLayerDataProvider.getInstance().currentTrip.add(
+        com.esri.arcgisruntime.geometry.Point(location.latitude, location.longitude)
+    )
+    onFogUpdate()
+}
+
 
 @OptIn(MapboxExperimental::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "IncorrectNumberOfArgumentsInExpression")
@@ -62,19 +114,27 @@ private fun MapScreen_Map() {
     val mapViewportState = rememberMapViewportState {
         setCameraOptions {
             center(fromLngLat(5.670663602650166, 48.5382684))
-            zoom(15.0)
+            zoom(10.0)
             pitch(0.0)
             style { }
         }
     }
 
     val drawable = ContextCompat.getDrawable(context, ca.uqac.fogmap.R.drawable.fog_bg5)
-    val fog_pattern = (drawable as BitmapDrawable).bitmap
+    val fogPattern = (drawable as BitmapDrawable).bitmap
 
-    val newPolygon = FogLayerDataProvider.getInstance(context).getFogPolygon()
+    FogLayerDataProvider.getInstance().initTracksData(context)
+    var fogPolygon by remember {
+        mutableStateOf(
+            FogLayerDataProvider.getInstance().getFogPolygon()
+        )
+    }
+    val onFogUpdate = {
+        fogPolygon = FogLayerDataProvider.getInstance().getFogPolygon()
+    }
 
-    var lines = ArrayList<Feature>().apply {
-        FogLayerDataProvider.getInstance(context).getAllTripLines().forEach { line ->
+    val lines = ArrayList<Feature>().apply {
+        FogLayerDataProvider.getInstance().getAllTripLines().forEach { line ->
             add(Feature.fromGeometry(line).apply {
                 addNumberProperty("color_r", Random.nextInt(0, 255))
                 addNumberProperty("color_g", Random.nextInt(0, 255))
@@ -107,38 +167,7 @@ private fun MapScreen_Map() {
         MapboxMap(
             Modifier.fillMaxSize(),
             style = {
-                MapboxStandardStyle(
-                    topSlot = {
-                        FillLayer(
-                            layerId = "fog_layer",
-                            sourceId = "fog_polygon_source",
-                            fillOpacity = FillOpacity(1.0),
-                            fillPattern = FillPattern("fog")
-                        )
-                        GeoJsonSource(
-                            sourceId = "fog_polygon_source",
-                            data = GeoJSONData(newPolygon),
-                        )
-
-                        LineLayer(
-                            layerId = "line_layer",
-                            sourceId = "line_source",
-                            lineColor = LineColor(
-                                rgba(
-                                    get("color_r"),
-                                    get("color_g"),
-                                    get("color_b"),
-                                    literal(1.0)
-                                )
-                            ),
-                            lineWidth = LineWidth(3.0)
-                        )
-                        GeoJsonSource(
-                            sourceId = "line_source",
-                            data = GeoJSONData(lines),
-                        )
-                    },
-                )
+                MapboxStandardStyle()
             },
             mapViewportState = mapViewportState,
             locationComponentSettings = DefaultSettingsProvider.defaultLocationComponentSettings(
@@ -150,23 +179,59 @@ private fun MapScreen_Map() {
                 .setPuckBearing(PuckBearing.HEADING)
                 .setEnabled(true)
                 .build(),
-
-            )
+        )
         {
+
+            // ================= LAYERS ======================
+
+            LineLayer(
+                layerId = "line_layer",
+                sourceId = "line_source",
+                lineColor = LineColor(
+                    rgba(
+                        get("color_r"),
+                        get("color_g"),
+                        get("color_b"),
+                        literal(1.0)
+                    )
+                ),
+                lineWidth = LineWidth(4.0)
+            )
+            GeoJsonSource(
+                sourceId = "line_source",
+                data = GeoJSONData(lines),
+            )
+
+            FillLayer(
+                layerId = "fog_layer",
+                sourceId = "fog_polygon_source",
+                fillOpacity = FillOpacity(.7),
+                fillPattern = FillPattern("fog"),
+            )
+            GeoJsonSource(
+                sourceId = "fog_polygon_source",
+                data = GeoJSONData(fogPolygon),
+            )
+
+
+            // ================= EFFECT ======================
+
             LaunchedEffect(Unit) {
                 mapViewportState.transitionToFollowPuckState()
+                initLocation(fogPolygon, onFogUpdate)
             }
 
             MapEffect { map ->
                 map.mapboxMap.addStyleImage(
                     imageId = "fog",
                     scale = 8F,
-                    image = fog_pattern.toMapboxImage(),
+                    image = fogPattern.toMapboxImage(),
                     sdf = false,
                     stretchX = listOf(ImageStretches(0.0F, 0.0F), ImageStretches(1.0F, 1.0F)),
                     stretchY = listOf(ImageStretches(0.0F, 0.0F), ImageStretches(1.0F, 1.0F)),
                     content = null
                 )
+                map.mapboxMap.loadStyle(Style.SATELLITE_STREETS)
             }
         }
     }

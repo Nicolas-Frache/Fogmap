@@ -13,48 +13,50 @@ import com.mapbox.geojson.LineString
 import com.mapbox.geojson.Point
 import com.mapbox.geojson.Geometry as GeometryMapBox
 
-var WholeWorld = Polygon(PointCollection(SpatialReferences.getWgs84()).apply {
+val WHOLE_WORLD = Polygon(PointCollection(SpatialReferences.getWgs84()).apply {
     add(90.0, -180.0)
     add(90.0, 180.0)
     add(-90.0, 180.0)
     add(-90.0, -180.0)
     add(90.0, -180.0)
 })
-var AllTripLines: ArrayList<Polyline> = ArrayList()
 
-class FogLayerDataProvider  {
-    private constructor(context: Context){
-        initTracksData(context)
-    }
+class FogLayerDataProvider private constructor() {
+    private var allTripLines: ArrayList<Polyline> = ArrayList()
+    val currentTrip: PointCollection = PointCollection(SpatialReferences.getWgs84())
 
     companion object {
         @Volatile
-        private var instance: FogLayerDataProvider? = null // Volatile modifier is necessary
+        private var instance: FogLayerDataProvider? = null
 
-        fun getInstance(context: Context) =
-            instance ?: synchronized(this) { // synchronized to avoid concurrency problem
-                instance ?: FogLayerDataProvider(context).also { instance = it }
+        fun getInstance() =
+            instance ?: synchronized(this) {
+                instance ?: FogLayerDataProvider().also { instance = it }
             }
     }
 
-    private fun initTracksData(context: Context) {
+    fun initTracksData(context: Context) {
         val files: Array<String> = context.fileList()
-        for(file in files){
-            if(file.contains(".geojson")){
-                AllTripLines.add(geoJsonTripToPolyline(context, file))
+        for (file in files) {
+            if (file.contains(".geojson")) {
+                allTripLines.add(geoJsonTripToPolyline(context, file))
             }
         }
     }
 
     fun getFogPolygon(): GeometryMapBox {
-        var bufferedPolygons = AllTripLines.map {
+        Log.d("FOGMAP", "getFogPolygon call with ${currentTrip.size} points")
+        if (currentTrip.size != 0) allTripLines.add(Polyline(currentTrip))
+        val bufferedPolygons = allTripLines.map {
             GeometryEngine.generalize(
                 GeometryEngine.buffer(it, .0015),
                 .00005,
                 true
             )
         }
-        if (AllTripLines.isEmpty()) return argGiPolygonToMapBox(bufferedPolygons[0])
+        if (currentTrip.size != 0) allTripLines.removeAt(allTripLines.size - 1)
+
+        if (allTripLines.isEmpty()) return argGiPolygonToMapBox(bufferedPolygons[0])
 
         var union = bufferedPolygons[0]
         for (i in 1 until bufferedPolygons.size) {
@@ -62,20 +64,26 @@ class FogLayerDataProvider  {
                 union,
                 bufferedPolygons[i]
             )
-            Log.d("FOGMAP", "Union $i: ${union.toJson()} ")
         }
-        Log.d("FOGMAP", "New Polygon 1: ${GeometryEngine.difference(WholeWorld, union).toJson()}")
-        return argGiPolygonToMapBox(GeometryEngine.difference(WholeWorld, union))
+        return argGiPolygonToMapBox(GeometryEngine.difference(WHOLE_WORLD, union))
     }
 
     fun getAllTripLines(): List<LineString> {
-        return AllTripLines.map { polyline ->
+        return allTripLines.map { polyline ->
             LineString.fromLngLats(
                 polyline.parts[0].map { part ->
                     Point.fromLngLat(part.startPoint.y, part.startPoint.x)
                 }
             )
         }
+    }
+
+    fun getCurrentTripLine(): LineString {
+        return LineString.fromLngLats(
+            currentTrip.map {
+                Point.fromLngLat(it.y, it.x)
+            }
+        )
     }
 }
 

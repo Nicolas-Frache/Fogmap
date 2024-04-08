@@ -8,3 +8,5 @@ samples/turf-master/
 samples/basic-android-kotlin-compose-training-inventory-app-starter/
 
 samples/
+
+src/app/.idea/deploymentTargetDropDown.xml
