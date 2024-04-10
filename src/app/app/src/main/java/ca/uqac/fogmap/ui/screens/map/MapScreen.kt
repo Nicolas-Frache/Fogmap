@@ -1,10 +1,14 @@
 package ca.uqac.fogmap.ui.screens.map
 
+import android.R
 import android.annotation.SuppressLint
 import android.graphics.drawable.BitmapDrawable
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Scaffold
@@ -16,21 +20,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import ca.uqac.fogmap.data.FogLayerDataProvider
-import com.mapbox.common.location.AccuracyLevel
-import com.mapbox.common.location.DeviceLocationProvider
-import com.mapbox.common.location.IntervalSettings
-import com.mapbox.common.location.Location
-import com.mapbox.common.location.LocationObserver
-import com.mapbox.common.location.LocationProviderRequest
-import com.mapbox.common.location.LocationService
-import com.mapbox.common.location.LocationServiceFactory
 import com.mapbox.geojson.Feature
-import com.mapbox.geojson.Geometry
 import com.mapbox.geojson.Point.fromLngLat
 import com.mapbox.maps.ImageStretches
 import com.mapbox.maps.MapboxExperimental
@@ -65,45 +62,6 @@ fun MapScreen_EntryPoint() {
         MapScreen_Map()
     }
 }
-
-fun initLocation(fogPolygon: Geometry, onFogUpdate: () -> Unit) {
-    val locationService: LocationService = LocationServiceFactory.getOrCreate()
-    var locationProvider: DeviceLocationProvider? = null
-
-    val request = LocationProviderRequest.Builder()
-        .interval(
-            IntervalSettings.Builder()
-                .interval(5000L).minimumInterval(5000L).maximumInterval(5000L)
-                .build()
-        )
-        .displacement(10F)
-        .accuracy(AccuracyLevel.HIGHEST)
-        .build();
-
-    val result = locationService.getDeviceLocationProvider(request)
-    if (result.isValue) {
-        locationProvider = result.value!!
-    } else {
-        Log.e("FOGMAP", "Failed to get device location provider")
-    }
-
-
-    val locationObserver = object : LocationObserver {
-        override fun onLocationUpdateReceived(locations: MutableList<Location>) {
-            updateLocation(locations[0], onFogUpdate)
-        }
-    }
-    locationProvider?.addLocationObserver(locationObserver)
-}
-
-fun updateLocation(location: Location, onFogUpdate: () -> Unit) {
-    Log.d("FOGMAP", "Location update received: $location")
-    FogLayerDataProvider.getInstance().currentTrip.add(
-        com.esri.arcgisruntime.geometry.Point(location.latitude, location.longitude)
-    )
-    onFogUpdate()
-}
-
 
 @OptIn(MapboxExperimental::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "IncorrectNumberOfArgumentsInExpression")
@@ -146,18 +104,37 @@ private fun MapScreen_Map() {
     Scaffold(
         floatingActionButton = {
             // Show locate button when viewport is in Idle state, e.g. camera is controlled by gestures.
-            if (mapViewportState.mapViewportStatus == ViewportStatus.Idle) {
+            Column {
+                if (mapViewportState.mapViewportStatus == ViewportStatus.Idle) {
+                    FloatingActionButton(
+                        onClick = {
+                            mapViewportState.transitionToFollowPuckState()
+                        },
+                        modifier = Modifier.padding(bottom = 10.dp).align(Alignment.End),
+                        shape = CircleShape
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_menu_mylocation),
+                            contentDescription = "Bouton Localisation"
+                        )
+                    }
+                }
                 FloatingActionButton(
                     onClick = {
-                        mapViewportState.transitionToFollowPuckState()
-                    }
+                        Log.d("FOGMAP", "Save current trip")
+                        saveCurrentTrip(context)
+                    },
+                    modifier = Modifier.padding(bottom = 10.dp).align(Alignment.End),
+                    shape = CircleShape
                 ) {
                     Image(
-                        painter = painterResource(id = android.R.drawable.ic_menu_mylocation),
-                        contentDescription = "Bouton Localisation"
+                        painter = painterResource(id = R.drawable.ic_menu_save),
+                        contentDescription = "Bouton sauvegarde"
                     )
                 }
             }
+
+
         },
         floatingActionButtonPosition = FabPosition.End,
         snackbarHost = {
@@ -181,7 +158,6 @@ private fun MapScreen_Map() {
                 .build(),
         )
         {
-
             // ================= LAYERS ======================
 
             LineLayer(
@@ -218,7 +194,7 @@ private fun MapScreen_Map() {
 
             LaunchedEffect(Unit) {
                 mapViewportState.transitionToFollowPuckState()
-                initLocation(fogPolygon, onFogUpdate)
+                initLocation(onFogUpdate)
             }
 
             MapEffect { map ->

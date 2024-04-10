@@ -37,9 +37,14 @@ class FogLayerDataProvider private constructor() {
 
     fun initTracksData(context: Context) {
         val files: Array<String> = context.fileList()
+
         for (file in files) {
             if (file.contains(".geojson")) {
                 allTripLines.add(geoJsonTripToPolyline(context, file))
+            } else if (file.contains(".arcgis.json")) {
+                allTripLines.add(Polyline.fromJson(
+                    context.openFileInput(file).bufferedReader().use { it.readText() }
+                ) as Polyline)
             }
         }
     }
