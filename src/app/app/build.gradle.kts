@@ -100,6 +100,9 @@ dependencies {
     // Outils pour les calculs géométriques sur la map
     implementation(libs.arcgis.android)
 
+    // Location Services
+    implementation(libs.play.services.location)
+
     //Room
     //implementation(libs.androidx.room.runtime)
     //ksp(libs.androidx.room.compiler)

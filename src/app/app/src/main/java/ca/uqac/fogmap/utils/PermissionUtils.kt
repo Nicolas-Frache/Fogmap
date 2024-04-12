@@ -31,9 +31,10 @@ public fun RequestLocationPermission(
 
     val permissions = ArrayList<String>().apply { addAll(locationPermissions) }
 
-    //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-    //    permissions.add(android.Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-    //}
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+        permissions.add(android.Manifest.permission.FOREGROUND_SERVICE_LOCATION)
+    }
+
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         permissions.add(android.Manifest.permission.POST_NOTIFICATIONS)
     }

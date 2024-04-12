@@ -1,4 +1,4 @@
-package ca.uqac.fogmap.ui.screens
+package ca.uqac.fogmap.ui.screens.home
 
 import android.content.Context
 import android.content.Intent
@@ -11,12 +11,18 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,11 +32,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ca.uqac.fogmap.MainActivity
 import ca.uqac.fogmap.R
 import ca.uqac.fogmap.common.customComposableViews.AlertDialogError
+import ca.uqac.fogmap.common.customComposableViews.MediumTitleText
 import ca.uqac.fogmap.common.customComposableViews.NormalButton
+import ca.uqac.fogmap.data.FogLayerDataProvider
+import ca.uqac.fogmap.locations.LocationService
+import ca.uqac.fogmap.locations.saveCurrentTrip
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
@@ -43,12 +55,13 @@ import kotlinx.coroutines.tasks.await
 
 
 @Composable
-fun WelcomeScreen() {
+fun WelcomeScreen(mainActivity: MainActivity) {
     val context = LocalContext.current
     val token: String = stringResource(id = R.string.default_web_client_id)
 
     var user by remember { mutableStateOf(Firebase.auth.currentUser) }
     val openAlertDialog = remember { mutableStateOf(false) }
+    val openSaveTripDialog = remember { mutableStateOf(false) }
     val launcher = rememberFirebaseAuthLauncher(
         onAuthComplete = { result ->
             user = result.user
@@ -59,6 +72,16 @@ fun WelcomeScreen() {
             openAlertDialog.value = !openAlertDialog.value
         }
     )
+    val isServiceRunning = remember {
+        mutableStateOf(FogLayerDataProvider.getInstance().currentTrip.size != 0)
+    }
+    val keyUpdateCurrentTrip by remember {
+        FogLayerDataProvider.getInstance().currentTripUpdateCount
+    }
+    val distance = remember { mutableStateOf("0") }
+    LaunchedEffect(key1 = keyUpdateCurrentTrip) {
+        distance.value = FogLayerDataProvider.getInstance().getCurrentTripDistance()
+    }
 
     when {
         openAlertDialog.value -> {
@@ -76,6 +99,32 @@ fun WelcomeScreen() {
         }
     }
 
+    fun stopServiceAndCloseDialog(saveTrip: Boolean) {
+        Intent(context, LocationService::class.java).apply {
+            action = LocationService.ACTION_STOP
+            mainActivity.stopService(this)
+        }
+        openSaveTripDialog.value = false
+        isServiceRunning.value = false
+        if (saveTrip) saveCurrentTrip(context)
+    }
+
+    when {
+        openSaveTripDialog.value -> {
+            StopTripDialog(
+                onDontSaveTrip = {
+                    stopServiceAndCloseDialog(false)
+                },
+                onSaveTrip = {
+                    stopServiceAndCloseDialog(true)
+                },
+                onDismissDialog = {
+                    openSaveTripDialog.value = false
+                }
+            )
+        }
+    }
+
     Surface(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -83,7 +132,7 @@ fun WelcomeScreen() {
         Text(text = "Bienvenue sur Fogmap !", style = typography.bodyLarge)
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
         ) {
             if (user == null) {
                 Text("Non connecté")
@@ -97,7 +146,6 @@ fun WelcomeScreen() {
             } else {
                 Text("Bienvenue ${user!!.displayName}")
                 Text("User UID:  ${user!!.uid}")
-                Spacer(modifier = Modifier.padding(15.dp))
                 NormalButton(
                     text = "Se déconnecter",
                     modifier = Modifier.width(300.dp),
@@ -107,6 +155,63 @@ fun WelcomeScreen() {
                     }
                 )
             }
+            Spacer(modifier = Modifier.padding(15.dp))
+
+            Card(
+                modifier = Modifier
+                    .padding(10.dp)
+                    .fillMaxWidth(),
+                shape = MaterialTheme.shapes.medium,
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                ),
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Bottom),
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .fillMaxWidth()
+                ) {
+                    MediumTitleText(
+                        text = "Trajet actuel",
+                        modifier = Modifier.padding(16.dp),
+                        textAlign = TextAlign.Center,
+                    )
+
+                    Text(
+                        text = "Distance parcourue: ${distance.value} km",
+                        modifier = Modifier.padding(16.dp),
+                    )
+
+                    when {
+                        !isServiceRunning.value -> {
+                            Button(
+                                modifier = Modifier.align(Alignment.CenterHorizontally),
+                                onClick = {
+                                    Intent(context, LocationService::class.java).apply {
+                                        action = LocationService.ACTION_START
+                                        mainActivity.startService(this)
+                                    }
+                                    isServiceRunning.value = true
+                                }) {
+                                Text(text = "Démarrer l'enregistrement de la position")
+                            }
+                        }
+
+                        else -> {
+                            Button(
+                                modifier = Modifier.align(Alignment.CenterHorizontally),
+                                onClick = {
+                                    openSaveTripDialog.value = true
+                                }) {
+                                Text(text = "Terminer le trajet en cours")
+                            }
+                        }
+                    }
+                }
+            }
+
         }
     }
 }
@@ -153,5 +258,5 @@ fun rememberFirebaseAuthLauncher(
 @Preview
 @Composable
 fun WelcomeScreenPreview() {
-    WelcomeScreen()
+    //WelcomeScreen(mainActivity, )
 }

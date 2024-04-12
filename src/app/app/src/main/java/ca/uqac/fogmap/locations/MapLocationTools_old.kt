@@ -1,4 +1,4 @@
-package ca.uqac.fogmap.ui.screens.map
+package ca.uqac.fogmap.locations
 
 import android.content.Context
 import android.util.Log
@@ -15,8 +15,8 @@ import com.mapbox.common.location.LocationServiceFactory
 import java.lang.System.currentTimeMillis
 import java.util.concurrent.TimeUnit
 
-
-fun initLocation(onFogUpdate: () -> Unit) {
+var onRemoveLocationObserver : () -> Unit = {}
+fun initLocationProvider(onFogUpdate: () -> Unit): () -> Unit {
     val locationService: LocationService = LocationServiceFactory.getOrCreate()
     var locationProvider: DeviceLocationProvider? = null
 
@@ -26,9 +26,10 @@ fun initLocation(onFogUpdate: () -> Unit) {
                 .interval(5000L).minimumInterval(5000L).maximumInterval(5000L)
                 .build()
         )
-        .displacement(10F)
+        //.displacement(10F)
+        .displacement(0F)
         .accuracy(AccuracyLevel.HIGHEST)
-        .build();
+        .build()
 
     val result = locationService.getDeviceLocationProvider(request)
     if (result.isValue) {
@@ -43,6 +44,8 @@ fun initLocation(onFogUpdate: () -> Unit) {
         }
     }
     locationProvider?.addLocationObserver(locationObserver)
+    onRemoveLocationObserver = { locationProvider?.removeLocationObserver(locationObserver) }
+    return onRemoveLocationObserver
 }
 
 fun updateLocation(location: Location, onFogUpdate: () -> Unit) {

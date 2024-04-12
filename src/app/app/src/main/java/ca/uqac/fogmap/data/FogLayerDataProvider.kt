@@ -2,6 +2,7 @@ package ca.uqac.fogmap.data
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.runtime.mutableIntStateOf
 import ca.uqac.fogmap.ui.screens.map.argGiPolygonToMapBox
 import ca.uqac.fogmap.ui.screens.map.geoJsonTripToPolyline
 import com.esri.arcgisruntime.geometry.GeometryEngine
@@ -24,6 +25,7 @@ val WHOLE_WORLD = Polygon(PointCollection(SpatialReferences.getWgs84()).apply {
 class FogLayerDataProvider private constructor() {
     private var allTripLines: ArrayList<Polyline> = ArrayList()
     val currentTrip: PointCollection = PointCollection(SpatialReferences.getWgs84())
+    var currentTripUpdateCount = mutableIntStateOf(0)
 
     companion object {
         @Volatile
@@ -88,6 +90,20 @@ class FogLayerDataProvider private constructor() {
             currentTrip.map {
                 Point.fromLngLat(it.y, it.x)
             }
+        )
+    }
+
+    fun updateCurrentTrip(lat: Double, long: Double) {
+        currentTrip.add(com.esri.arcgisruntime.geometry.Point(lat, long))
+        currentTripUpdateCount.intValue++
+    }
+
+    fun getCurrentTripDistance(): String {
+        return String.format(
+            "%.2f",
+            GeometryEngine.length(
+                Polyline(currentTrip)
+            ) * 100
         )
     }
 }

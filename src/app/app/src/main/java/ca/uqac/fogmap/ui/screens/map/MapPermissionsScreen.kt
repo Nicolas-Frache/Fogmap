@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-fun MapPermissionScreen(mapScreenContent: @Composable () -> Unit) {
+fun MapPermissionScreen(screenContent: @Composable () -> Unit) {
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -59,7 +59,7 @@ fun MapPermissionScreen(mapScreenContent: @Composable () -> Unit) {
             }
         )
         if (showMap) {
-            mapScreenContent()
+            screenContent()
         }
         if (showRequestPermissionButton) {
             Box(modifier = Modifier.fillMaxSize()) {

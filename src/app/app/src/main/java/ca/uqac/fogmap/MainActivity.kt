@@ -1,5 +1,7 @@
 package ca.uqac.fogmap
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -58,9 +60,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import ca.uqac.fogmap.common.customComposableViews.MediumTitleText
 import ca.uqac.fogmap.data.model.LoggedAccountViewModel
+import ca.uqac.fogmap.locations.LocationService
 import ca.uqac.fogmap.ui.screens.FogmapNavigationGraph
 import ca.uqac.fogmap.ui.screens.Routes
-import ca.uqac.fogmap.ui.screens.rememberFirebaseAuthLauncher
+import ca.uqac.fogmap.ui.screens.map.MapPermissionScreen
+import ca.uqac.fogmap.ui.screens.home.rememberFirebaseAuthLauncher
 import ca.uqac.fogmap.ui.theme.FogmapTheme
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -70,14 +74,15 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
-    public var PACKAGE_NAME: String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         initMockData()
-        PACKAGE_NAME = applicationContext.packageName;
         setContent {
             FogmapTheme {
-                FogmapApp()
+                MapPermissionScreen{
+                    FogmapApp(this)
+                }
             }
         }
         Log.d("FOGMAP", applicationContext.packageName)
@@ -92,7 +97,25 @@ class MainActivity : ComponentActivity() {
                 Log.e("MainActivity", "Error adding user to Firestore", exception)
             }
         }
+        //startService(Intent(this, ForeGroundService::class.java))
+
+        val channel = NotificationChannel(
+            "location",
+            "Location",
+            NotificationManager.IMPORTANCE_LOW
+        )
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
     }
+
+    fun startService(){
+        Intent(applicationContext, LocationService::class.java).apply {
+            action = LocationService.ACTION_STOP
+            startService(this)
+        }
+    }
+
 
 
     private fun initMockData() {
@@ -131,7 +154,8 @@ class MainActivity : ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun FogmapApp() {
+    fun FogmapApp(mainActivity: MainActivity) {
+
         var user by remember { mutableStateOf(Firebase.auth.currentUser) }
         val items = listOf(
             NavigationItem(
@@ -294,7 +318,7 @@ class MainActivity : ComponentActivity() {
                             .fillMaxSize()
                             .padding(paddingValue)
                     ) {
-                        FogmapNavigationGraph(navController, loggedAccountViewModel)
+                        FogmapNavigationGraph(navController, loggedAccountViewModel, mainActivity)
                     }
                 }
             }

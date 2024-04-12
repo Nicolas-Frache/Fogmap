@@ -15,6 +15,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,6 +28,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import ca.uqac.fogmap.data.FogLayerDataProvider
+import ca.uqac.fogmap.data.saveCurrentTrip
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.Point.fromLngLat
 import com.mapbox.maps.ImageStretches
@@ -101,6 +103,10 @@ private fun MapScreen_Map() {
         }
     }
 
+    val keyUpdateCurrentTrip by remember {
+        FogLayerDataProvider.getInstance().currentTripUpdateCount
+    }
+
     Scaffold(
         floatingActionButton = {
             // Show locate button when viewport is in Idle state, e.g. camera is controlled by gestures.
@@ -110,7 +116,9 @@ private fun MapScreen_Map() {
                         onClick = {
                             mapViewportState.transitionToFollowPuckState()
                         },
-                        modifier = Modifier.padding(bottom = 10.dp).align(Alignment.End),
+                        modifier = Modifier
+                            .padding(bottom = 10.dp)
+                            .align(Alignment.End),
                         shape = CircleShape
                     ) {
                         Image(
@@ -124,7 +132,9 @@ private fun MapScreen_Map() {
                         Log.d("FOGMAP", "Save current trip")
                         saveCurrentTrip(context)
                     },
-                    modifier = Modifier.padding(bottom = 10.dp).align(Alignment.End),
+                    modifier = Modifier
+                        .padding(bottom = 10.dp)
+                        .align(Alignment.End),
                     shape = CircleShape
                 ) {
                     Image(
@@ -194,8 +204,19 @@ private fun MapScreen_Map() {
 
             LaunchedEffect(Unit) {
                 mapViewportState.transitionToFollowPuckState()
-                initLocation(onFogUpdate)
             }
+
+            DisposableEffect(keyUpdateCurrentTrip) {
+                Log.d("FOGMAP", "Current trip updated")
+                onFogUpdate()
+
+                //val onRemoveLocationProvider = initLocationProvider(onFogUpdate)
+                onDispose {
+                    //onRemoveLocationProvider()
+                    //Log.d("FOGMAP", "Location observer removed")
+                }
+            }
+
 
             MapEffect { map ->
                 map.mapboxMap.addStyleImage(
@@ -212,3 +233,4 @@ private fun MapScreen_Map() {
         }
     }
 }
+

@@ -13,9 +13,11 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import ca.uqac.fogmap.MainActivity
 import ca.uqac.fogmap.data.model.LoggedAccountViewModel
 import ca.uqac.fogmap.ui.screens.account.login.LoginScreen
 import ca.uqac.fogmap.ui.screens.account.registration.RegistrationScreen
+import ca.uqac.fogmap.ui.screens.home.WelcomeScreen
 import ca.uqac.fogmap.ui.screens.map.MapScreen_EntryPoint
 import ca.uqac.fogmap.ui.screens.questions.AnswerPage
 import ca.uqac.fogmap.ui.screens.questions.QuestionListPage
@@ -24,7 +26,8 @@ import ca.uqac.fogmap.ui.screens.questions.QuestionPage
 @Composable
 fun FogmapNavigationGraph(
     navController: NavHostController,
-    loggedAccountViewModel: LoggedAccountViewModel
+    loggedAccountViewModel: LoggedAccountViewModel,
+    mainActivity: MainActivity
 ) {
     Column(
         modifier = Modifier
@@ -45,7 +48,7 @@ fun FogmapNavigationGraph(
             }
 
             composable(Routes.WELCOME_SCREEN) {
-                WelcomeScreen()
+                WelcomeScreen(mainActivity)
             }
 
             composable(Routes.VISITED_LOCATION_SCREEN) {
