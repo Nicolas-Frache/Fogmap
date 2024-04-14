@@ -28,7 +28,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import ca.uqac.fogmap.data.FogLayerDataProvider
-import ca.uqac.fogmap.data.saveCurrentTrip
+import ca.uqac.fogmap.locations.saveCurrentTrip
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.Point.fromLngLat
 import com.mapbox.maps.ImageStretches

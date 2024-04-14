@@ -1,7 +1,8 @@
-package ca.uqac.fogmap.ui.screens.home
+package ca.uqac.fogmap.ui.screens.settings
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,22 +19,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import ca.uqac.fogmap.common.customComposableViews.MediumTitleText
-import ca.uqac.fogmap.data.FogLayerDataProvider
 
 @Composable
-fun StopTripDialog(
-    onDiscardTrip: () -> Unit,
-    onSaveTrip: () -> Unit,
-    onDismissDialog: () -> Unit,
+fun ConfirmationDialog(
+    title : String,
+    description : String,
+    onConfirm: () -> Unit,
+    onCancel: () -> Unit,
 ) {
-    val distance = FogLayerDataProvider.getInstance().getCurrentTripDistance()
 
-    Dialog(onDismissRequest = onDismissDialog) {
+    Dialog(onDismissRequest = onCancel) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(375.dp)
-                .padding(16.dp),
+                .height(IntrinsicSize.Min)
+                .padding(4.dp),
             shape = RoundedCornerShape(16.dp),
         ) {
             Column(
@@ -43,13 +43,12 @@ fun StopTripDialog(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 MediumTitleText(
-                    text = "Sauvegarde du trajet",
+                    text = title,
                     modifier = Modifier.padding(16.dp),
                     textAlign = TextAlign.Center,
                 )
                 Text(
-                    text = "Souhaitez-vous enregistrer le trajet actuel de $distance km afin qu'il soit" +
-                            " pris en compte dans votre historique d'exploration du monde ?",
+                    text = description,
                     modifier = Modifier.padding(16.dp),
                 )
                 Row(
@@ -58,16 +57,16 @@ fun StopTripDialog(
                     horizontalArrangement = Arrangement.Center,
                 ) {
                     TextButton(
-                        onClick = { onDiscardTrip() },
+                        onClick = { onConfirm() },
                         modifier = Modifier.padding(8.dp),
                     ) {
-                        Text("Ne pas enregistrer")
+                        Text("Annuler")
                     }
                     TextButton(
-                        onClick = { onSaveTrip() },
+                        onClick = { onCancel() },
                         modifier = Modifier.padding(8.dp),
                     ) {
-                        Text("Enregistrer")
+                        Text("Confirmer")
                     }
                 }
             }

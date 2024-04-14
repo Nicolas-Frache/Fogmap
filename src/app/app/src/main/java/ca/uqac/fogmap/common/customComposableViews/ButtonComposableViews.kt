@@ -4,7 +4,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.QuestionMark
 import androidx.compose.material3.Button
@@ -56,7 +55,7 @@ fun SmallClickableWithIconAndText(
         Text(
             modifier = Modifier.padding(start = AppTheme.dimens.paddingSmall),
             text = text,
-            style = MaterialTheme.typography.titleSmall,
+            style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.primary
         )
     }

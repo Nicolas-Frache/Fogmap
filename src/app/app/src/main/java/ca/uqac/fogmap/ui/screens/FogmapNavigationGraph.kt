@@ -22,6 +22,7 @@ import ca.uqac.fogmap.ui.screens.map.MapScreen_EntryPoint
 import ca.uqac.fogmap.ui.screens.questions.AnswerPage
 import ca.uqac.fogmap.ui.screens.questions.QuestionListPage
 import ca.uqac.fogmap.ui.screens.questions.QuestionPage
+import ca.uqac.fogmap.ui.screens.settings.SettingsScreen
 
 @Composable
 fun FogmapNavigationGraph(
@@ -36,7 +37,7 @@ fun FogmapNavigationGraph(
     ) {
         NavHost(navController = navController, startDestination = Routes.WELCOME_SCREEN) {
             composable(Routes.USER_INPUT_SCREEN) {
-                UserInputScreen(navController)
+                SettingsScreen(navController)
             }
 
             composable(Routes.MY_ACCOUNT) {

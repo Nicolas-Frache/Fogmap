@@ -42,6 +42,7 @@ import ca.uqac.fogmap.common.customComposableViews.MediumTitleText
 import ca.uqac.fogmap.common.customComposableViews.NormalButton
 import ca.uqac.fogmap.data.FogLayerDataProvider
 import ca.uqac.fogmap.locations.LocationService
+import ca.uqac.fogmap.locations.clearCurrentTrip
 import ca.uqac.fogmap.locations.saveCurrentTrip
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -75,12 +76,14 @@ fun WelcomeScreen(mainActivity: MainActivity) {
     val isServiceRunning = remember {
         mutableStateOf(FogLayerDataProvider.getInstance().currentTrip.size != 0)
     }
+
     val keyUpdateCurrentTrip by remember {
         FogLayerDataProvider.getInstance().currentTripUpdateCount
     }
     val distance = remember { mutableStateOf("0") }
     LaunchedEffect(key1 = keyUpdateCurrentTrip) {
         distance.value = FogLayerDataProvider.getInstance().getCurrentTripDistance()
+        Log.d("FOGMAP", "size: ${FogLayerDataProvider.getInstance().currentTrip.size}")
     }
 
     when {
@@ -106,13 +109,17 @@ fun WelcomeScreen(mainActivity: MainActivity) {
         }
         openSaveTripDialog.value = false
         isServiceRunning.value = false
-        if (saveTrip) saveCurrentTrip(context)
+
+        if (saveTrip)
+            saveCurrentTrip(context)
+        else
+            clearCurrentTrip()
     }
 
     when {
         openSaveTripDialog.value -> {
             StopTripDialog(
-                onDontSaveTrip = {
+                onDiscardTrip = {
                     stopServiceAndCloseDialog(false)
                 },
                 onSaveTrip = {
