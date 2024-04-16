@@ -12,4 +12,5 @@ object Routes {
     const val ADD_LOCATION = "ADD_LOCATION"
     const val MY_ACCOUNT = "MY_ACCOUNT"
     const val QUESTION = "QUESTION"
+    const val TRIP_HISTORY = "TRIP_HISTORY"
 }

@@ -1,6 +1,5 @@
 package ca.uqac.fogmap.ui.screens.settings
 
-import android.R
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,6 +24,7 @@ import androidx.navigation.compose.rememberNavController
 import ca.uqac.fogmap.common.customComposableViews.MediumTitleText
 import ca.uqac.fogmap.common.customComposableViews.TitleText
 import ca.uqac.fogmap.locations.deleteTripHistory
+import ca.uqac.fogmap.ui.screens.Routes
 
 @Composable
 fun SettingsScreen(navController: NavHostController) {
@@ -64,11 +64,11 @@ fun SettingsScreen(navController: NavHostController) {
             MediumTitleText(text = "Mes trajets")
             Button(
                 onClick = {
-
+                    navController.navigate(Routes.TRIP_HISTORY)
                 }) {
                 Image(
                     // R.drawable.ic_menu_view
-                    painter = painterResource(id = R.drawable.ic_menu_view),
+                    painter = painterResource(id = android.R.drawable.ic_menu_view),
                     contentDescription = ""
                 )
                 Text(text = "Consulter mes trajets")
@@ -81,7 +81,7 @@ fun SettingsScreen(navController: NavHostController) {
             )
             {
                 Image(
-                    painter = painterResource(id = R.drawable.ic_menu_delete),
+                    painter = painterResource(id = android.R.drawable.ic_menu_delete),
                     contentDescription = ""
                 )
                 Text(

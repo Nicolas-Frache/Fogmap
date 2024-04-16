@@ -57,13 +57,13 @@ fun ConfirmationDialog(
                     horizontalArrangement = Arrangement.Center,
                 ) {
                     TextButton(
-                        onClick = { onConfirm() },
+                        onClick = { onCancel() },
                         modifier = Modifier.padding(8.dp),
                     ) {
                         Text("Annuler")
                     }
                     TextButton(
-                        onClick = { onCancel() },
+                        onClick = { onConfirm() },
                         modifier = Modifier.padding(8.dp),
                     ) {
                         Text("Confirmer")

@@ -63,8 +63,8 @@ import ca.uqac.fogmap.data.model.LoggedAccountViewModel
 import ca.uqac.fogmap.locations.LocationService
 import ca.uqac.fogmap.ui.screens.FogmapNavigationGraph
 import ca.uqac.fogmap.ui.screens.Routes
-import ca.uqac.fogmap.ui.screens.map.MapPermissionScreen
 import ca.uqac.fogmap.ui.screens.home.rememberFirebaseAuthLauncher
+import ca.uqac.fogmap.ui.screens.map.MapPermissionScreen
 import ca.uqac.fogmap.ui.theme.FogmapTheme
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -120,6 +120,7 @@ class MainActivity : ComponentActivity() {
 
     private fun initMockData() {
         val files: Array<String> = applicationContext.fileList()
+        Log.d("FOGMAP", files[0])
         Log.d("FOGMAP", "${files.size} files in local storage")
         if (files.size < 3) {
             copyFileToLocalStorage(R.raw.sample_track_1, "sample_track_1.geojson")

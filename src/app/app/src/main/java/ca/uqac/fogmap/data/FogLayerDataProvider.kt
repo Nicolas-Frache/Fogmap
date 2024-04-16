@@ -78,8 +78,13 @@ class FogLayerDataProvider private constructor() {
     fun getAllTripLines(): List<LineString> {
         return allTripLines.map { polyline ->
             LineString.fromLngLats(
-                polyline.parts[0].map { part ->
+                ArrayList(polyline.parts[0].map { part ->
                     Point.fromLngLat(part.startPoint.y, part.startPoint.x)
+                }).apply {
+                    add(Point.fromLngLat(
+                        polyline.parts[0].last().endPoint.y,
+                        polyline.parts[0].last().endPoint.x
+                    ))
                 }
             )
         }

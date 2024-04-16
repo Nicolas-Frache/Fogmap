@@ -23,6 +23,7 @@ import ca.uqac.fogmap.ui.screens.questions.AnswerPage
 import ca.uqac.fogmap.ui.screens.questions.QuestionListPage
 import ca.uqac.fogmap.ui.screens.questions.QuestionPage
 import ca.uqac.fogmap.ui.screens.settings.SettingsScreen
+import ca.uqac.fogmap.ui.screens.settings.TripHistoryScreen
 
 @Composable
 fun FogmapNavigationGraph(
@@ -58,6 +59,10 @@ fun FogmapNavigationGraph(
 
             composable(Routes.ADD_LOCATION) {
                 AddLocation(navController)
+            }
+
+            composable(Routes.TRIP_HISTORY) {
+                TripHistoryScreen()
             }
 
             composable(
