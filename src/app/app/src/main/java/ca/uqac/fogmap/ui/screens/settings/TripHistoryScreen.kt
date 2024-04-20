@@ -12,12 +12,15 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -29,6 +32,9 @@ import ca.uqac.fogmap.data.model.TripState
 
 @Composable
 fun TrajetListItem(trip: TripState) {
+    val context = LocalContext.current
+    val isVisible = remember { mutableStateOf(trip.isVisible) }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -67,16 +73,29 @@ fun TrajetListItem(trip: TripState) {
 
                 FloatingActionButton(
                     onClick = {
+                        trip.isVisible = !trip.isVisible
+                        trip.saveTrip(context)
+                        isVisible.value = trip.isVisible
                     },
                     modifier = Modifier
                         .padding(bottom = 4.dp)
                         .size(50.dp),
                     shape = CircleShape
                 ) {
-                    Icon(
-                        Icons.Filled.Visibility, contentDescription = "",
-                        modifier = Modifier.size(30.dp),
-                    )
+                    when{
+                        isVisible.value -> {
+                            Icon(
+                                Icons.Filled.Visibility, contentDescription = "",
+                                modifier = Modifier.size(30.dp),
+                            )
+                        } else -> {
+                            Icon(
+                                Icons.Filled.VisibilityOff, contentDescription = "",
+                                modifier = Modifier.size(30.dp),
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -93,7 +112,7 @@ fun TripList(trajets: List<TripState>) {
 }
 
 @Composable
-fun TripHistoryScreen(){
+fun TripHistoryScreen() {
     TripListModel.getInstance().initTripListModel(LocalContext.current)
     TripList(TripListModel.getInstance().trips)
 }
@@ -102,9 +121,9 @@ fun TripHistoryScreen(){
 @Composable
 fun PreviewTrajetList() {
     val trajets = listOf(
-        TripState(true, 11, 21, 31, null),
-        TripState(false, 12, 22, 32, null),
-        TripState(true, 13, 23, 33, null),
+        TripState("a", true, 11, 21, 31, null),
+        TripState("a", false, 12, 22, 32, null),
+        TripState("a", true, 13, 23, 33, null),
     )
     TripList(trajets = trajets)
 }

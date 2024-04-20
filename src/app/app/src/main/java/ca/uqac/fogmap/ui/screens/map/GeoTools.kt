@@ -2,6 +2,7 @@ package ca.uqac.fogmap.ui.screens.map
 
 import android.content.Context
 import com.esri.arcgisruntime.geometry.Geometry
+import com.esri.arcgisruntime.geometry.GeometryEngine
 import com.esri.arcgisruntime.geometry.PointCollection
 import com.esri.arcgisruntime.geometry.Polyline
 import com.esri.arcgisruntime.geometry.SpatialReferences
@@ -52,3 +53,11 @@ fun geoJsonTripToPolyline(context: Context, filename: String): Polyline {
     })
 }
 
+fun polylineToDistanceInFormattedString(polyline: Polyline): String {
+    return String.format(
+        "%.2f",
+        GeometryEngine.length(
+            polyline
+        ) * 100
+    )
+}

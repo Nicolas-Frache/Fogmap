@@ -3,8 +3,9 @@ package ca.uqac.fogmap.data
 import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.mutableIntStateOf
+import ca.uqac.fogmap.data.model.TripListModel
 import ca.uqac.fogmap.ui.screens.map.argGiPolygonToMapBox
-import ca.uqac.fogmap.ui.screens.map.geoJsonTripToPolyline
+import ca.uqac.fogmap.ui.screens.map.polylineToDistanceInFormattedString
 import com.esri.arcgisruntime.geometry.GeometryEngine
 import com.esri.arcgisruntime.geometry.PointCollection
 import com.esri.arcgisruntime.geometry.Polygon
@@ -22,10 +23,11 @@ val WHOLE_WORLD = Polygon(PointCollection(SpatialReferences.getWgs84()).apply {
     add(90.0, -180.0)
 })
 
-class FogLayerDataProvider private constructor() {
-    private var allTripLines: ArrayList<Polyline> = ArrayList()
+class FogLayerDataProvider private constructor(
+) {
     val currentTrip: PointCollection = PointCollection(SpatialReferences.getWgs84())
     var currentTripUpdateCount = mutableIntStateOf(0)
+    lateinit var tripListModel: TripListModel
 
     companion object {
         @Volatile
@@ -38,56 +40,59 @@ class FogLayerDataProvider private constructor() {
     }
 
     fun initTracksData(context: Context) {
-        val files: Array<String> = context.fileList()
+        tripListModel = TripListModel.getInstance()
+        tripListModel.initTripListModel(context)
 
-        for (file in files) {
-            if (file.contains(".geojson")) {
-                allTripLines.add(geoJsonTripToPolyline(context, file))
-            } else if (file.contains(".arcgis.json")) {
-                allTripLines.add(Polyline.fromJson(
-                    context.openFileInput(file).bufferedReader().use { it.readText() }
-                ) as Polyline)
-            }
-        }
     }
 
     fun getFogPolygon(): GeometryMapBox {
         Log.d("FOGMAP", "getFogPolygon call with ${currentTrip.size} points")
-        if (currentTrip.size != 0) allTripLines.add(Polyline(currentTrip))
-        val bufferedPolygons = allTripLines.map {
+        val polylines = ArrayList(tripListModel.trips
+            .filter { it.isVisible }
+            .mapNotNull { it.polyline })
+        if (currentTrip.size != 0) polylines.add(Polyline(currentTrip))
+
+        if(polylines.isEmpty()) return argGiPolygonToMapBox(WHOLE_WORLD)
+
+        val bufferedPolygons = polylines.map {
             GeometryEngine.generalize(
                 GeometryEngine.buffer(it, .0015),
                 .00005,
                 true
             )
         }
-        if (currentTrip.size != 0) allTripLines.removeAt(allTripLines.size - 1)
-
-        if (allTripLines.isEmpty()) return argGiPolygonToMapBox(bufferedPolygons[0])
+        if (currentTrip.size != 0) polylines.removeAt(polylines.size - 1)
 
         var union = bufferedPolygons[0]
-        for (i in 1 until bufferedPolygons.size) {
-            union = GeometryEngine.union(
-                union,
-                bufferedPolygons[i]
-            )
+        if (tripListModel.trips.isNotEmpty()) {
+            for (i in 1 until bufferedPolygons.size) {
+                union = GeometryEngine.union(
+                    union,
+                    bufferedPolygons[i]
+                )
+            }
         }
         return argGiPolygonToMapBox(GeometryEngine.difference(WHOLE_WORLD, union))
     }
 
     fun getAllTripLines(): List<LineString> {
-        return allTripLines.map { polyline ->
-            LineString.fromLngLats(
-                ArrayList(polyline.parts[0].map { part ->
-                    Point.fromLngLat(part.startPoint.y, part.startPoint.x)
-                }).apply {
-                    add(Point.fromLngLat(
-                        polyline.parts[0].last().endPoint.y,
-                        polyline.parts[0].last().endPoint.x
-                    ))
-                }
-            )
-        }
+        return tripListModel.trips
+            .filter { it.isVisible }
+            .mapNotNull { it.polyline }
+            .mapNotNull { polyline ->
+                LineString.fromLngLats(
+                    ArrayList(polyline.parts[0].map { part ->
+                        Point.fromLngLat(part.startPoint.y, part.startPoint.x)
+                    }).apply {
+                        add(
+                            Point.fromLngLat(
+                                polyline.parts[0].last().endPoint.y,
+                                polyline.parts[0].last().endPoint.x
+                            )
+                        )
+                    }
+                )
+            }
     }
 
     fun getCurrentTripLine(): LineString {
@@ -104,13 +109,13 @@ class FogLayerDataProvider private constructor() {
     }
 
     fun getCurrentTripDistance(): String {
-        return String.format(
-            "%.2f",
-            GeometryEngine.length(
-                Polyline(currentTrip)
-            ) * 100
-        )
+        return polylineToDistanceInFormattedString(Polyline(currentTrip))
     }
+
+    fun notifyTripListUpdate() {
+        currentTripUpdateCount.intValue++
+    }
+
 }
 
 

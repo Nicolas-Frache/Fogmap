@@ -18,11 +18,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -30,6 +29,8 @@ import androidx.core.content.ContextCompat
 import ca.uqac.fogmap.data.FogLayerDataProvider
 import ca.uqac.fogmap.locations.saveCurrentTrip
 import com.mapbox.geojson.Feature
+import com.mapbox.geojson.Geometry
+import com.mapbox.geojson.LineString
 import com.mapbox.geojson.Point.fromLngLat
 import com.mapbox.maps.ImageStretches
 import com.mapbox.maps.MapboxExperimental
@@ -80,31 +81,33 @@ private fun MapScreen_Map() {
         }
     }
 
+    val fogLayerDataProvider = FogLayerDataProvider.getInstance()
+    fogLayerDataProvider.initTracksData(context)
+
+
     val drawable = ContextCompat.getDrawable(context, ca.uqac.fogmap.R.drawable.fog_bg5)
     val fogPattern = (drawable as BitmapDrawable).bitmap
 
-    FogLayerDataProvider.getInstance().initTracksData(context)
-    var fogPolygon by remember {
-        mutableStateOf(
-            FogLayerDataProvider.getInstance().getFogPolygon()
-        )
+    val keyUpdateCurrentTrip by remember {
+        fogLayerDataProvider.currentTripUpdateCount
     }
+
+    var fogPolygon : Geometry = fogLayerDataProvider.getFogPolygon()
+    var currentLine : LineString = fogLayerDataProvider.getCurrentTripLine()
+
     val onFogUpdate = {
-        fogPolygon = FogLayerDataProvider.getInstance().getFogPolygon()
+        fogPolygon = fogLayerDataProvider.getFogPolygon()
+        currentLine = fogLayerDataProvider.getCurrentTripLine()
     }
 
     val lines = ArrayList<Feature>().apply {
-        FogLayerDataProvider.getInstance().getAllTripLines().forEach { line ->
+        fogLayerDataProvider.getAllTripLines().forEach { line ->
             add(Feature.fromGeometry(line).apply {
                 addNumberProperty("color_r", Random.nextInt(0, 255))
                 addNumberProperty("color_g", Random.nextInt(0, 255))
                 addNumberProperty("color_b", Random.nextInt(0, 255))
             })
         }
-    }
-
-    val keyUpdateCurrentTrip by remember {
-        FogLayerDataProvider.getInstance().currentTripUpdateCount
     }
 
     Scaffold(
@@ -143,8 +146,6 @@ private fun MapScreen_Map() {
                     )
                 }
             }
-
-
         },
         floatingActionButtonPosition = FabPosition.End,
         snackbarHost = {
@@ -181,11 +182,22 @@ private fun MapScreen_Map() {
                         literal(1.0)
                     )
                 ),
-                lineWidth = LineWidth(4.0)
+                lineWidth = LineWidth(3.0)
             )
             GeoJsonSource(
                 sourceId = "line_source",
                 data = GeoJSONData(lines),
+            )
+
+            LineLayer(
+                layerId = "current_trip_layer",
+                sourceId = "current_trip_source",
+                lineColor = LineColor(Color.Red),
+                lineWidth = LineWidth(7.0)
+            )
+            GeoJsonSource(
+                sourceId = "current_trip_source",
+                data = GeoJSONData(currentLine),
             )
 
             FillLayer(
