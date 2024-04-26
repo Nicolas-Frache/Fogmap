@@ -18,6 +18,8 @@ import ca.uqac.fogmap.data.model.LoggedAccountViewModel
 import ca.uqac.fogmap.ui.screens.account.login.LoginScreen
 import ca.uqac.fogmap.ui.screens.account.registration.RegistrationScreen
 import ca.uqac.fogmap.ui.screens.home.WelcomeScreen
+import ca.uqac.fogmap.ui.screens.locations.AddLocation
+import ca.uqac.fogmap.ui.screens.locations.LocationInformation
 import ca.uqac.fogmap.ui.screens.map.MapScreen_EntryPoint
 import ca.uqac.fogmap.ui.screens.questions.AnswerPage
 import ca.uqac.fogmap.ui.screens.questions.QuestionListPage
