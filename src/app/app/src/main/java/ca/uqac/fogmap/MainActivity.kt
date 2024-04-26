@@ -80,7 +80,7 @@ class MainActivity : ComponentActivity() {
         initMockData()
         setContent {
             FogmapTheme {
-                MapPermissionScreen{
+                MapPermissionScreen {
                     FogmapApp(this)
                 }
             }
@@ -109,26 +109,29 @@ class MainActivity : ComponentActivity() {
         notificationManager.createNotificationChannel(channel)
     }
 
-    fun startService(){
+    fun startService() {
         Intent(applicationContext, LocationService::class.java).apply {
             action = LocationService.ACTION_STOP
             startService(this)
         }
     }
 
-
-
     private fun initMockData() {
         val files: Array<String> = applicationContext.fileList()
         Log.d("FOGMAP", files[0])
         Log.d("FOGMAP", "${files.size} files in local storage")
-        if (files.size < 3) {
+        if (!files.contains("sample_track_1.arcgis.json")) {
             copyFileToLocalStorage(R.raw.sample_track_1, "sample_track_1.geojson")
-            copyFileToLocalStorage(R.raw.sample_track_2, "sample_track_2.geojson")
-            copyFileToLocalStorage(R.raw.sample_track_3, "sample_track_3.geojson")
-            Log.d("FOGMAP", "Mock data copied to local storage")
         }
+        if (!files.contains("sample_track_3.arcgis.json")) {
+            copyFileToLocalStorage(R.raw.sample_track_3, "sample_track_3.geojson")
+        }
+        if (!files.contains("sample_track_2.arcgis.json")) {
+            copyFileToLocalStorage(R.raw.sample_track_2, "sample_track_2.geojson")
+        }
+        Log.d("FOGMAP", "Mock data copied to local storage")
     }
+
 
     fun copyFileToLocalStorage(ressourceId: Int, filename: String) {
         val fileContents =
@@ -325,7 +328,7 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-    // https://youtu.be/dEEyZkZekvI?si=HkFDP_s9SgX-GD84&t=1976
+// https://youtu.be/dEEyZkZekvI?si=HkFDP_s9SgX-GD84&t=1976
 }
 
 fun addUserToFirestore(user: FirebaseUser?, onComplete: (Boolean, Exception?) -> Unit) {

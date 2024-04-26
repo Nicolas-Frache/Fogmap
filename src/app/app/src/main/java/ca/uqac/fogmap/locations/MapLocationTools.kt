@@ -4,7 +4,7 @@ import android.content.Context
 import ca.uqac.fogmap.data.FogLayerDataProvider
 import ca.uqac.fogmap.data.model.TripListModel
 import ca.uqac.fogmap.data.model.TripState
-import ca.uqac.fogmap.ui.screens.map.polylineToDistanceInFormattedString
+import ca.uqac.fogmap.ui.screens.map.polylineToDistanceInMeters
 import com.esri.arcgisruntime.geometry.Polyline
 import java.lang.System.currentTimeMillis
 import java.util.concurrent.TimeUnit
@@ -22,10 +22,10 @@ fun saveCurrentTrip(context: Context) {
         filename = "$timeStamp.arcgis.json",
         polyline = tripPolyline,
         date = timeStamp.toInt(),
-        distance = polylineToDistanceInFormattedString(tripPolyline).toDouble(),
+        distance = polylineToDistanceInMeters(tripPolyline),
         surface = 0.0
     )
-    TripListModel.getInstance().addTrip(tripState, context)
+    TripListModel.getInstance().registerNewTrip(tripState, context)
 
     clearCurrentTrip()
 }

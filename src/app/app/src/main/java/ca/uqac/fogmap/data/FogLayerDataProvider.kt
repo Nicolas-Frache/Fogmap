@@ -42,7 +42,6 @@ class FogLayerDataProvider private constructor(
     fun initTracksData(context: Context) {
         tripListModel = TripListModel.getInstance()
         tripListModel.initTripListModel(context)
-
     }
 
     fun getFogPolygon(): GeometryMapBox {
@@ -64,7 +63,7 @@ class FogLayerDataProvider private constructor(
         if (currentTrip.size != 0) polylines.removeAt(polylines.size - 1)
 
         var union = bufferedPolygons[0]
-        if (tripListModel.trips.isNotEmpty()) {
+        if (bufferedPolygons.size > 1) {
             for (i in 1 until bufferedPolygons.size) {
                 union = GeometryEngine.union(
                     union,

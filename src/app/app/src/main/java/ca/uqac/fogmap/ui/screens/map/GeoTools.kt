@@ -61,3 +61,9 @@ fun polylineToDistanceInFormattedString(polyline: Polyline): String {
         ) * 100
     )
 }
+
+fun polylineToDistanceInMeters(polyline: Polyline): Double {
+    return GeometryEngine.length(
+        polyline
+    ) * 100
+}

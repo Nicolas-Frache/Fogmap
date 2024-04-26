@@ -6,7 +6,7 @@ import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.mutableIntStateOf
 import ca.uqac.fogmap.data.FogLayerDataProvider
 import ca.uqac.fogmap.ui.screens.map.geoJsonTripToPolyline
-import ca.uqac.fogmap.ui.screens.map.polylineToDistanceInFormattedString
+import ca.uqac.fogmap.ui.screens.map.polylineToDistanceInMeters
 import com.esri.arcgisruntime.geometry.Polyline
 import com.google.gson.Gson
 import com.google.gson.JsonObject
@@ -43,6 +43,12 @@ class TripState(
             it.write(Gson().toJson(jsontree).toByteArray())
         }
     }
+
+    fun deleteTrip(context: Context) {
+        context.deleteFile(filename)
+        TripListModel.getInstance().removeTrip(this)
+        FogLayerDataProvider.getInstance().notifyTripListUpdate()
+    }
 }
 
 class TripListModel(
@@ -60,6 +66,7 @@ class TripListModel(
     }
 
     fun initTripListModel(context: Context) {
+        Log.d("FOGMAP", "Nb trips in model : ${trips.size}")
         if (trips.isNotEmpty()) return
 
         val files: Array<String> = context.fileList()
@@ -72,8 +79,8 @@ class TripListModel(
                     TripState(
                         filename = file.replace(".geojson", ".arcgis.json"),
                         polyline = polyline,
-                        distance = polylineToDistanceInFormattedString(polyline).toDouble(),
-                        date = (random()*1000).toInt(),
+                        distance = polylineToDistanceInMeters(polyline),
+                        date = (random() * 1000).toInt(),
                     )
                 )
                 context.deleteFile(file)
@@ -87,7 +94,8 @@ class TripListModel(
 
     private fun importArcJson(filename: String, context: Context): TripState {
         val text = context.openFileInput(filename).bufferedReader().use { it.readText() }
-        val tripValues = JsonParser.parseString(text).asJsonObject.get("fogmap_trip").asJsonObject
+        val tripValues =
+            JsonParser.parseString(text).asJsonObject.get("fogmap_trip").asJsonObject
 
         val polyline = Polyline.fromJson(
             context.openFileInput(filename).bufferedReader().use { it.readText() }
@@ -103,9 +111,15 @@ class TripListModel(
         )
     }
 
-    fun addTrip(tripState: TripState, context: Context){
+    fun registerNewTrip(tripState: TripState, context: Context) {
         trips.add(tripState)
         tripState.saveTrip(context)
+        tripsUpdateCount = mutableIntStateOf(tripsUpdateCount.intValue + 1)
+        FogLayerDataProvider.getInstance().notifyTripListUpdate()
+    }
+
+    fun removeTrip(tripState: TripState) {
+        trips.remove(tripState)
         tripsUpdateCount = mutableIntStateOf(tripsUpdateCount.intValue + 1)
         FogLayerDataProvider.getInstance().notifyTripListUpdate()
     }
