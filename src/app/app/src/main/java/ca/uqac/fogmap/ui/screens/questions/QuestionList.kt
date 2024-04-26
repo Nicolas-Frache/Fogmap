@@ -1,6 +1,7 @@
 package ca.uqac.fogmap.ui.screens.questions
 
 data class Question(
+    val index: Int,
     val text: String,
     val options: List<String>,
     val answer: Int,
@@ -9,18 +10,21 @@ data class Question(
 
 val questions = listOf(
     Question(
+        0,
         "Quelle est la capitale de la France ?",
         listOf("Paris", "Londres", "Berlin", "Madrid"),
         0,
         "Paris est la capitale de la France depuis le XVIe siècle."
     ),
     Question(
+        1,
         "Quel est le plus grand mammifère marin ?",
         listOf("Baleine bleue", "Requin blanc", "Dauphin", "Orca"),
         0,
         "La baleine bleue est le plus grand mammifère marin et peut mesurer jusqu'à 30 mètres de long."
     ),
     Question(
+        2,
         "Qui a peint la Joconde ?",
         listOf("Leonard de Vinci", "Pablo Picasso", "Vincent van Gogh", "Michel-Ange"),
         0,

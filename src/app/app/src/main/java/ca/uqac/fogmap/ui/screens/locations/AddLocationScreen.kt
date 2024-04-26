@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import ca.uqac.fogmap.locations.LocationImpl
 import ca.uqac.fogmap.locations.MapLocations
 import ca.uqac.fogmap.ui.screens.Routes
 
@@ -54,7 +55,7 @@ fun AddLocation(navController: NavController) {
         )
         Button(
             onClick = {
-                MapLocations.map[title.text] = description.text
+                MapLocations.map[title.text] = LocationImpl(title.text, description.text)
                 navController.navigate(Routes.VISITED_LOCATION_SCREEN)
             },
             modifier = Modifier.padding(top = 40.dp),

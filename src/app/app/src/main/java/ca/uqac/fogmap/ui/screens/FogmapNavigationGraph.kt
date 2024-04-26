@@ -74,6 +74,7 @@ fun FogmapNavigationGraph(
                 val name = backStackEntry.arguments?.getString("name") ?: "John Doe"
                 LocationInformation(
                     name = name,
+                    navController = navController
                 )
             }
 

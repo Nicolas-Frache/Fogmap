@@ -32,8 +32,8 @@ fun TitledBubbleListPage(navController: NavController) {
         Text(
             text = "Lieux visités",
             modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 16.dp),
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
             textAlign = TextAlign.Center,
             style = TextStyle(fontSize = 24.sp)
         )
@@ -52,7 +52,9 @@ fun TitledBubbleListPage(navController: NavController) {
                 ) {
                     Text(
                         text = item,
-                        modifier = Modifier.padding(8.dp).padding(start = 16.dp),
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .padding(start = 16.dp),
                         color = Color.White
                     )
                 }

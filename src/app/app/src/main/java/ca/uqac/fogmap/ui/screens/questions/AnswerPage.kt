@@ -20,46 +20,53 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import ca.uqac.fogmap.locations.MapLocations
 import ca.uqac.fogmap.ui.screens.Routes
 
 @Composable
 fun AnswerPage(navController: NavController, questionIndex: Int, selectedOption: Int) {
-    val question = remember { questions[questionIndex] }
+    val question = remember { MapLocations.questions.values.flatten().find { it.index == questionIndex } }
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Text(
-            text = if (selectedOption == question.answer) {
-                "Bravo, c'est la bonne réponse !"
-            } else {
-                "Désolé, ce n'est pas la bonne réponse."
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            textAlign = TextAlign.Center,
-            style = TextStyle(fontSize = 24.sp)
-        )
-        Text(
-            text = "La bonne réponse est : ${question.options[question.answer]}",
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            textAlign = TextAlign.Center,
-            style = TextStyle(fontSize = 20.sp)
-        )
-        Text(
-            text = question.description,
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Justify,
-            style = TextStyle(fontSize = 16.sp)
-        )
+        if (question != null) {
+            Text(
+                text = if (selectedOption == question.answer) {
+                    "Bravo, c'est la bonne réponse !"
+                } else {
+                    "Désolé, ce n'est pas la bonne réponse."
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                textAlign = TextAlign.Center,
+                style = TextStyle(fontSize = 24.sp)
+            )
+        }
+        if (question != null) {
+            Text(
+                text = "La bonne réponse est : ${question.options[question.answer]}",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                textAlign = TextAlign.Center,
+                style = TextStyle(fontSize = 20.sp)
+            )
+        }
+        if (question != null) {
+            Text(
+                text = question.description,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Justify,
+                style = TextStyle(fontSize = 16.sp)
+            )
+        }
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = {
-                navController.navigate(Routes.QUESTION)
+                navController.navigate(Routes.VISITED_LOCATION_SCREEN)
             },
             modifier = Modifier.fillMaxWidth()
         ) {
