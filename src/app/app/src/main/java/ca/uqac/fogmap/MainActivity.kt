@@ -198,12 +198,12 @@ class MainActivity : ComponentActivity() {
                 unselectedIcon = Icons.Outlined.Settings,
                 route = Routes.USER_INPUT_SCREEN,
             ),
-            NavigationItem(
+            /*NavigationItem(
                 title = "Questions",
                 selectedIcon = Icons.Filled.Description,
                 unselectedIcon = Icons.Outlined.Description,
                 route = Routes.QUESTION,
-            )
+            )*/
         )
         val navController = rememberNavController()
         val loggedAccountViewModel = viewModel { LoggedAccountViewModel() }

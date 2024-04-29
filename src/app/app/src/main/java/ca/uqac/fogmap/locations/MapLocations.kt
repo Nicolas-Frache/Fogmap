@@ -40,24 +40,24 @@ object MapLocations {
             Question(
                 0,
                 "Quelle est l'année de construction ?",
-                listOf("1444", "1445", "1446", "1447"),
+                listOf("1655", "1445", "1446", "1447"),
                 0,
-                "Le parlement a été construit en 1444"
+                "Le parlement a été construit en 1655"
             ),
             Question(
                 1,
                 "Quelle est l'année de l'incendie ?",
-                listOf("1444", "1445", "1446", "1447"),
+                listOf("1994", "1445", "1446", "1447"),
                 0,
-                "La mairie a été construite en 1444")
+                "La mairie a été construite en 1994")
         ),
         "Mairie de Rennes" to mutableListOf(
             Question(
                 2,
                 "Quelle est l'année de construction ?",
-                listOf("1444", "1445", "1446", "1447"),
+                listOf("1743", "1445", "1883", "1447"),
                 0,
-                "La mairie a été construite en 1444"
+                "La mairie a été construite en 1743"
             ),
             Question(
                 3,
